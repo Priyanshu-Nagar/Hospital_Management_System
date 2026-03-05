@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Doctors - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">
+            <i class="bi bi-person-badge"></i> Our Doctors
+        </h2>
+        <p class="lead">Browse our qualified medical professionals</p>
+        
+        <div class="mb-3">
+            <a href="{{ url_for('user.book_appointment') }}" class="btn btn-success">
+                <i class="bi bi-calendar-plus"></i> Book Appointment
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    {% if doctors %}
+        {% for doctor in doctors %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-person-circle display-1 text-primary"></i>
+                    </div>
+                    <h5 class="card-title text-center">{{ doctor.name }}</h5>
+                    <p class="text-center text-muted">
+                        <i class="bi bi-hospital"></i> {{ doctor.specialization }}
+                    </p>
+                    <hr>
+                    <div class="text-center">
+                        <a href="{{ url_for('user.book_appointment') }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-calendar-check"></i> Book Appointment
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> No doctors available at the moment.
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

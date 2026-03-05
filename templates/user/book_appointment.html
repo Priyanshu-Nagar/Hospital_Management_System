@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Book Appointment - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-calendar-plus"></i> Book New Appointment</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('user.book_appointment') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.doctor_id.label(class="form-label") }}
+                        {{ form.doctor_id(class="form-select" + (" is-invalid" if form.doctor_id.errors else "")) }}
+                        {% if form.doctor_id.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.doctor_id.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Choose your preferred doctor</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.date.label(class="form-label") }}
+                        {{ form.date(class="form-control" + (" is-invalid" if form.date.errors else "")) }}
+                        {% if form.date.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.date.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Select a future date and time for your appointment</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Note:</strong> Your appointment will be in "Pending" status until confirmed by admin.
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-success btn-lg") }}
+                        <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Instructions Card -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Booking Instructions</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Select your preferred doctor from the dropdown</li>
+                    <li>Choose a future date and time for your appointment</li>
+                    <li>Wait for admin confirmation</li>
+                    <li>You will be notified once your appointment is confirmed</li>
+                    <li>You can cancel your appointment anytime before it's completed</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}My Appointments - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">
+            <i class="bi bi-calendar-check"></i> My Appointments
+        </h2>
+        
+        <div class="mb-3">
+            <a href="{{ url_for('user.book_appointment') }}" class="btn btn-success">
+                <i class="bi bi-calendar-plus"></i> Book New Appointment
+            </a>
+            <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        {% if appointments %}
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Doctor</th>
+                                    <th>Specialization</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                    <th>Booked On</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for apt in appointments %}
+                                <tr>
+                                    <td>{{ apt.id }}</td>
+                                    <td>{{ apt.doctor.name }}</td>
+                                    <td>{{ apt.doctor.specialization }}</td>
+                                    <td>{{ apt.date.strftime('%d %b %Y, %I:%M %p') }}</td>
+                                    <td>
+                                        {% if apt.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-clock"></i> Pending
+                                            </span>
+                                        {% elif apt.status == 'confirmed' %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Confirmed
+                                            </span>
+                                        {% elif apt.status == 'completed' %}
+                                            <span class="badge bg-info">
+                                                <i class="bi bi-check-all"></i> Completed
+                                            </span>
+                                        {% elif apt.status == 'cancelled' %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i> Cancelled
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ apt.created_at.strftime('%d %b %Y') }}</td>
+                                    <td>
+                                        {% if apt.status not in ['completed', 'cancelled'] %}
+                                            <a href="{{ url_for('user.cancel_appointment', appointment_id=apt.id) }}" 
+                                               class="btn btn-sm btn-danger"
+                                               onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                                <i class="bi bi-trash"></i> Cancel
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Legend -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6>Status Legend:</h6>
+                    <span class="badge bg-warning text-dark me-2">Pending</span> Waiting for admin confirmation
+                    <span class="badge bg-success me-2 ms-3">Confirmed</span> Appointment confirmed by admin
+                    <span class="badge bg-info me-2 ms-3">Completed</span> Appointment completed
+                    <span class="badge bg-danger me-2 ms-3">Cancelled</span> Appointment cancelled
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <h4><i class="bi bi-info-circle"></i> No Appointments Found</h4>
+                <p>You haven't booked any appointments yet.</p>
+                <a href="{{ url_for('user.book_appointment') }}" class="btn btn-success">
+                    <i class="bi bi-calendar-plus"></i> Book Your First Appointment
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
