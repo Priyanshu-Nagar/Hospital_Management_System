@@ -43,3 +43,16 @@ class AppointmentForm(FlaskForm):
     doctor_id = SelectField('Select Doctor', coerce=int, validators=[DataRequired()])
     date = DateTimeLocalField('Appointment Date & Time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
     submit = SubmitField('Book Appointment')
+
+
+class DoctorForm(FlaskForm):
+    """Doctor add/edit form"""
+    name = StringField('Doctor Name', validators=[
+        DataRequired(),
+        Length(min=2, max=100)
+    ])
+    specialization = StringField('Specialization', validators=[
+        DataRequired(),
+        Length(min=2, max=100)
+    ])
+    submit = SubmitField('Save Doctor')

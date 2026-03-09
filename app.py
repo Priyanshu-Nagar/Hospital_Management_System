@@ -28,13 +28,11 @@ def load_user(user_id):
 # Import and register blueprints
 from auth import auth_bp
 from user import user_bp
+from admin import admin_bp
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(user_bp, url_prefix='/user')
-
-# Note: admin_bp will be added later
-# from admin_routes import admin_bp
-# app.register_blueprint(admin_bp, url_prefix='/admin')
+app.register_blueprint(admin_bp, url_prefix='/admin')
 
 
 @app.route('/')
@@ -46,6 +44,7 @@ def index():
 # Create database tables
 with app.app_context():
     db.create_all()
+    print("✅ Database tables created successfully!")
 
 
 if __name__ == '__main__':

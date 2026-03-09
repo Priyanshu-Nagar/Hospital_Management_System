@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Add Doctor - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Add New Doctor</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_doctor') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), placeholder="Enter doctor's full name") }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.specialization.label(class="form-label") }}
+                        {{ form.specialization(class="form-control" + (" is-invalid" if form.specialization.errors else ""), placeholder="e.g., Cardiologist, Pediatrician") }}
+                        {% if form.specialization.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.specialization.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-success btn-lg") }}
+                        <a href="{{ url_for('admin.doctors') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

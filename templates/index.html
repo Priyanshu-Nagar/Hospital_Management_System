@@ -17,7 +17,7 @@
                 <h4>Welcome, {{ current_user.name }}!</h4>
                 <p>You are logged in as a <strong>{{ current_user.role }}</strong>.</p>
                 {% if current_user.is_admin %}
-                    <a href="#" class="btn btn-primary">Go to Admin Dashboard</a>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Go to Admin Dashboard</a>
                 {% else %}
                     <a href="{{ url_for('user.dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
                 {% endif %}

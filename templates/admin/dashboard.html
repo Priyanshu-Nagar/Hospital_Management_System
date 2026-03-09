@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">
+            <i class="bi bi-speedometer2"></i> Admin Dashboard
+        </h2>
+        <p class="lead">Welcome, <strong>{{ current_user.name }}</strong>!</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-people"></i> Total Patients
+                </h5>
+                <h2 class="card-text">{{ total_users }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-person-badge"></i> Total Doctors
+                </h5>
+                <h2 class="card-text">{{ total_doctors }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-calendar-check"></i> Total Appointments
+                </h5>
+                <h2 class="card-text">{{ total_appointments }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-clock"></i> Pending
+                </h5>
+                <h2 class="card-text">{{ pending_appointments }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Appointment Status Cards -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="card border-success mb-3">
+            <div class="card-body text-center">
+                <i class="bi bi-check-circle display-4 text-success"></i>
+                <h5 class="mt-2">Confirmed</h5>
+                <h3>{{ confirmed_appointments }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-info mb-3">
+            <div class="card-body text-center">
+                <i class="bi bi-check-all display-4 text-info"></i>
+                <h5 class="mt-2">Completed</h5>
+                <h3>{{ completed_appointments }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-danger mb-3">
+            <div class="card-body text-center">
+                <i class="bi bi-x-circle display-4 text-danger"></i>
+                <h5 class="mt-2">Cancelled</h5>
+                <h3>{{ cancelled_appointments }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.add_doctor') }}" class="btn btn-success btn-lg w-100 mb-2">
+                            <i class="bi bi-person-plus"></i> Add Doctor
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.doctors') }}" class="btn btn-info btn-lg w-100 mb-2">
+                            <i class="bi bi-person-badge"></i> Manage Doctors
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.patients') }}" class="btn btn-primary btn-lg w-100 mb-2">
+                            <i class="bi bi-people"></i> View Patients
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.appointments') }}" class="btn btn-warning btn-lg w-100 mb-2">
+                            <i class="bi bi-calendar-check"></i> Manage Appointments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Appointments -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Appointments</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_appointments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for apt in recent_appointments %}
+                                <tr>
+                                    <td>{{ apt.id }}</td>
+                                    <td>{{ apt.patient.name }}</td>
+                                    <td>{{ apt.doctor.name }}</td>
+                                    <td>{{ apt.date.strftime('%d %b %Y, %I:%M %p') }}</td>
+                                    <td>
+                                        {% if apt.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        {% elif apt.status == 'confirmed' %}
+                                            <span class="badge bg-success">Confirmed</span>
+                                        {% elif apt.status == 'completed' %}
+                                            <span class="badge bg-info">Completed</span>
+                                        {% elif apt.status == 'cancelled' %}
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> No appointments yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

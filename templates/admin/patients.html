@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Patients - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">
+            <i class="bi bi-people"></i> Manage Patients
+        </h2>
+        
+        <div class="mb-3">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        {% if patients %}
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Appointments</th>
+                                    <th>Registered On</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for patient in patients %}
+                                <tr>
+                                    <td>{{ patient.id }}</td>
+                                    <td><i class="bi bi-person-circle text-primary"></i> {{ patient.name }}</td>
+                                    <td>{{ patient.email }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ patient.appointments|length }} appointments</span>
+                                    </td>
+                                    <td>{{ patient.created_at.strftime('%d %b %Y') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.delete_patient', patient_id=patient.id) }}" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Are you sure you want to delete {{ patient.name }}? All their appointments will also be deleted. This action cannot be undone.')">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <i class="bi bi-info-circle"></i> <strong>Total Patients:</strong> {{ patients|length }}
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <h4><i class="bi bi-exclamation-triangle"></i> No Patients Found</h4>
+                <p>No patients have registered yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
