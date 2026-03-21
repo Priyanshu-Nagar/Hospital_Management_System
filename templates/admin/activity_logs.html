@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Logs - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">
+            <i class="bi bi-clock-history"></i> Activity Logs
+        </h2>
+        <p class="lead">System activity and user action tracking</p>
+        
+        <div class="mb-3">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        {% if logs %}
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Recent Activities (Last 100 entries)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.id }}</td>
+                                    <td>
+                                        {% if log.user %}
+                                            <i class="bi bi-person-circle {% if log.user.is_admin %}text-danger{% else %}text-primary{% endif %}"></i>
+                                            {{ log.user.name }}
+                                            {% if log.user.is_admin %}
+                                                <span class="badge bg-danger">Admin</span>
+                                            {% else %}
+                                                <span class="badge bg-primary">User</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">System</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if 'registered' in log.action %}
+                                            <i class="bi bi-person-plus-fill text-success"></i>
+                                        {% elif 'booked' in log.action %}
+                                            <i class="bi bi-calendar-plus-fill text-primary"></i>
+                                        {% elif 'cancelled' in log.action %}
+                                            <i class="bi bi-x-circle-fill text-danger"></i>
+                                        {% elif 'updated' in log.action %}
+                                            <i class="bi bi-pencil-fill text-warning"></i>
+                                        {% elif 'confirmed' in log.action %}
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                        {% else %}
+                                            <i class="bi bi-info-circle-fill text-info"></i>
+                                        {% endif %}
+                                        {{ log.action }}
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-clock"></i> 
+                                        {{ log.timestamp.strftime('%d %b %Y, %I:%M %p') }}
+                                        <br>
+                                        <small class="text-muted">
+                                            {% set time_diff = (now - log.timestamp).total_seconds() %}
+                                            {% if time_diff < 60 %}
+                                                Just now
+                                            {% elif time_diff < 3600 %}
+                                                {{ (time_diff / 60) | int }} minutes ago
+                                            {% elif time_diff < 86400 %}
+                                                {{ (time_diff / 3600) | int }} hours ago
+                                            {% else %}
+                                                {{ (time_diff / 86400) | int }} days ago
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <i class="bi bi-info-circle"></i> <strong>Total Logs Displayed:</strong> {{ logs|length }}
+            </div>
+            
+            <!-- Legend -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6>Activity Icons Legend:</h6>
+                    <i class="bi bi-person-plus-fill text-success"></i> User Registration &nbsp;&nbsp;
+                    <i class="bi bi-calendar-plus-fill text-primary"></i> Appointment Booking &nbsp;&nbsp;
+                    <i class="bi bi-x-circle-fill text-danger"></i> Cancellation &nbsp;&nbsp;
+                    <i class="bi bi-check-circle-fill text-success"></i> Confirmation &nbsp;&nbsp;
+                    <i class="bi bi-pencil-fill text-warning"></i> Status Update &nbsp;&nbsp;
+                    <i class="bi bi-info-circle-fill text-info"></i> Other Actions
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <h4><i class="bi bi-exclamation-triangle"></i> No Activity Logs</h4>
+                <p>No activity has been logged yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <i class="bi bi-person-plus display-4 text-success"></i>
+                <h5 class="mt-2">Registrations</h5>
+                <h3>{{ registration_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-plus display-4 text-primary"></i>
+                <h5 class="mt-2">Bookings</h5>
+                <h3>{{ booking_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-danger">
+            <div class="card-body text-center">
+                <i class="bi bi-x-circle display-4 text-danger"></i>
+                <h5 class="mt-2">Cancellations</h5>
+                <h3>{{ cancellation_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <i class="bi bi-pencil display-4 text-warning"></i>
+                <h5 class="mt-2">Admin Updates</h5>
+                <h3>{{ admin_update_count }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

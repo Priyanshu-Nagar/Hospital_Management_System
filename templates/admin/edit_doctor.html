@@ -37,6 +37,32 @@
                         {% endif %}
                     </div>
                     
+                    <div class="mb-3">
+                        {{ form.available_days.label(class="form-label") }}
+                        {{ form.available_days(class="form-control" + (" is-invalid" if form.available_days.errors else ""), placeholder="e.g., Mon-Fri, Mon/Wed/Fri") }}
+                        {% if form.available_days.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.available_days.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Optional: Days when doctor is available</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.available_time.label(class="form-label") }}
+                        {{ form.available_time(class="form-control" + (" is-invalid" if form.available_time.errors else ""), placeholder="e.g., 10:00 AM - 2:00 PM") }}
+                        {% if form.available_time.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.available_time.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Optional: Time slots when doctor is available</small>
+                    </div>
+                    
                     <div class="d-grid gap-2">
                         {{ form.submit(class="btn btn-primary btn-lg") }}
                         <a href="{{ url_for('admin.doctors') }}" class="btn btn-secondary">Cancel</a>

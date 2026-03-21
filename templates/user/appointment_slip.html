@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Slip - {{ appointment.id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                margin: 0;
+                padding: 20px;
+            }
+            .slip-container {
+                box-shadow: none !important;
+                border: 2px solid #000 !important;
+            }
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .slip-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        .hospital-header {
+            text-align: center;
+            border-bottom: 3px solid #0d6efd;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .hospital-header h1 {
+            color: #0d6efd;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .hospital-header p {
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .slip-title {
+            text-align: center;
+            background: #0d6efd;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        
+        .info-row {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            width: 200px;
+            color: #495057;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: #212529;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .status-completed {
+            background: #cff4fc;
+            color: #055160;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #842029;
+        }
+        
+        .footer-note {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px dashed #dee2e6;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Button -->
+    <div class="no-print print-btn">
+        <button onclick="window.print()" class="btn btn-primary btn-lg">
+            <i class="bi bi-printer"></i> Print Slip
+        </button>
+        <button onclick="window.close()" class="btn btn-secondary btn-lg ms-2">
+            <i class="bi bi-x-circle"></i> Close
+        </button>
+    </div>
+
+    <div class="slip-container">
+        <!-- Hospital Header -->
+        <div class="hospital-header">
+            <h1><i class="bi bi-hospital"></i> Hospital Management System</h1>
+            <p>Quality Healthcare for Everyone</p>
+            <p><i class="bi bi-geo-alt"></i> Hospital Address, City, State | <i class="bi bi-telephone"></i> +1234567890</p>
+        </div>
+
+        <!-- Slip Title -->
+        <div class="slip-title">
+            <h3 class="mb-0"><i class="bi bi-file-text"></i> APPOINTMENT SLIP</h3>
+        </div>
+
+        <!-- Appointment Details -->
+        <div class="appointment-details">
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-hash"></i> Appointment ID:</div>
+                <div class="info-value"><strong>#{{ appointment.id }}</strong></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-person"></i> Patient Name:</div>
+                <div class="info-value"><strong>{{ appointment.patient.name }}</strong></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-envelope"></i> Patient Email:</div>
+                <div class="info-value">{{ appointment.patient.email }}</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-person-badge"></i> Doctor Name:</div>
+                <div class="info-value"><strong>{{ appointment.doctor.name }}</strong></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-hospital"></i> Specialization:</div>
+                <div class="info-value">{{ appointment.doctor.specialization }}</div>
+            </div>
+
+            {% if appointment.doctor.available_days %}
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-calendar-week"></i> Doctor Available Days:</div>
+                <div class="info-value">{{ appointment.doctor.available_days }}</div>
+            </div>
+            {% endif %}
+
+            {% if appointment.doctor.available_time %}
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-clock"></i> Doctor Available Time:</div>
+                <div class="info-value">{{ appointment.doctor.available_time }}</div>
+            </div>
+            {% endif %}
+
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-calendar-event"></i> Appointment Date & Time:</div>
+                <div class="info-value"><strong style="font-size: 18px; color: #0d6efd;">{{ appointment.date.strftime('%d %B %Y, %I:%M %p') }}</strong></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-calendar-plus"></i> Booked On:</div>
+                <div class="info-value">{{ appointment.created_at.strftime('%d %B %Y, %I:%M %p') }}</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label"><i class="bi bi-flag"></i> Status:</div>
+                <div class="info-value">
+                    {% if appointment.status == 'pending' %}
+                        <span class="status-badge status-pending">
+                            <i class="bi bi-clock"></i> PENDING
+                        </span>
+                    {% elif appointment.status == 'confirmed' %}
+                        <span class="status-badge status-confirmed">
+                            <i class="bi bi-check-circle"></i> CONFIRMED
+                        </span>
+                    {% elif appointment.status == 'completed' %}
+                        <span class="status-badge status-completed">
+                            <i class="bi bi-check-all"></i> COMPLETED
+                        </span>
+                    {% elif appointment.status == 'cancelled' %}
+                        <span class="status-badge status-cancelled">
+                            <i class="bi bi-x-circle"></i> CANCELLED
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Important Notes -->
+        <div class="footer-note">
+            <p><strong><i class="bi bi-exclamation-triangle"></i> Important Instructions:</strong></p>
+            <ul style="text-align: left; display: inline-block; margin: 10px 0;">
+                <li>Please arrive 15 minutes before your appointment time</li>
+                <li>Bring this slip and a valid ID proof</li>
+                <li>Bring all previous medical records and test reports</li>
+                <li>For any changes, please contact the hospital in advance</li>
+            </ul>
+            <hr style="margin: 20px 0;">
+            <p class="mb-0">
+                <i class="bi bi-calendar-check"></i> Generated on: {{ appointment.created_at.strftime('%d %B %Y, %I:%M %p') }}
+            </p>
+            <p class="mt-2"><small>This is a computer-generated slip. No signature required.</small></p>
+        </div>
+    </div>
+
+    <!-- Back to Appointments Button (No Print) -->
+    <div class="no-print text-center mt-4">
+        <a href="{{ url_for('user.appointments') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Appointments
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

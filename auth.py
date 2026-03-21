@@ -9,6 +9,8 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """User registration"""
+    from models import ActivityLog
+    
     if current_user.is_authenticated:
         return redirect(url_for('user.dashboard'))
     
@@ -29,6 +31,14 @@ def register():
         user.set_password(form.password.data)
         
         db.session.add(user)
+        db.session.commit()
+        
+        # Log activity
+        log = ActivityLog(
+            user_id=user.id,
+            action=f'New user registered: {user.name} ({user.email})'
+        )
+        db.session.add(log)
         db.session.commit()
         
         flash('Registration successful! Please login.', 'success')

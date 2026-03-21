@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Create Announcement - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-megaphone"></i> Create New Announcement</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_announcement') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else ""), placeholder="e.g., Hospital Timings Update") }}
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.title.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Enter a clear and concise title (5-200 characters)</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.message.label(class="form-label") }}
+                        {{ form.message(class="form-control" + (" is-invalid" if form.message.errors else ""), rows=6, placeholder="Enter your announcement message here...") }}
+                        {% if form.message.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.message.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Provide details about the announcement (10-1000 characters)</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Note:</strong> This announcement will be visible to all patients on their dashboard.
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-success btn-lg") }}
+                        <a href="{{ url_for('admin.announcements') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Preview Card -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-eye"></i> Preview Tips</h5>
+            </div>
+            <div class="card-body">
+                <h6>Example Announcements:</h6>
+                <ul>
+                    <li><strong>Title:</strong> "Hospital Closed on Public Holiday"<br>
+                        <strong>Message:</strong> "The hospital will remain closed on [date] for [holiday]. Emergency services will be available 24/7."</li>
+                    <li><strong>Title:</strong> "New Doctor Joined"<br>
+                        <strong>Message:</strong> "We are pleased to announce Dr. [Name], specialist in [field], has joined our team."</li>
+                    <li><strong>Title:</strong> "Updated Operating Hours"<br>
+                        <strong>Message:</strong> "Effective [date], our OPD timings will be [new timings]."</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

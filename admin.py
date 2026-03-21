@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
-from models import db, User, Doctor, Appointment
-from forms import DoctorForm
 from functools import wraps
+from models import db, User, Doctor, Appointment, Announcement, ActivityLog
+from forms import DoctorForm, AnnouncementForm
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -23,6 +23,9 @@ def admin_required(f):
 @admin_required
 def dashboard():
     """Admin dashboard with statistics"""
+    from datetime import datetime, timedelta
+    from sqlalchemy import func
+    
     # Get statistics
     total_users = User.query.filter_by(role='user').count()
     total_doctors = Doctor.query.count()
@@ -37,6 +40,27 @@ def dashboard():
     # Recent appointments
     recent_appointments = Appointment.query.order_by(Appointment.created_at.desc()).limit(5).all()
     
+    # Chart Data: Appointments per day (last 7 days)
+    today = datetime.now().date()
+    appointments_per_day = []
+    day_labels = []
+    
+    for i in range(6, -1, -1):  # Last 7 days
+        day = today - timedelta(days=i)
+        day_start = datetime.combine(day, datetime.min.time())
+        day_end = datetime.combine(day, datetime.max.time())
+        
+        count = Appointment.query.filter(
+            Appointment.created_at >= day_start,
+            Appointment.created_at <= day_end
+        ).count()
+        
+        appointments_per_day.append(count)
+        day_labels.append(day.strftime('%a, %b %d'))
+    
+    # Recent activity logs
+    recent_logs = ActivityLog.query.order_by(ActivityLog.timestamp.desc()).limit(5).all()
+    
     return render_template('admin/dashboard.html',
                          total_users=total_users,
                          total_doctors=total_doctors,
@@ -45,7 +69,10 @@ def dashboard():
                          confirmed_appointments=confirmed_appointments,
                          completed_appointments=completed_appointments,
                          cancelled_appointments=cancelled_appointments,
-                         recent_appointments=recent_appointments)
+                         recent_appointments=recent_appointments,
+                         appointments_per_day=appointments_per_day,
+                         day_labels=day_labels,
+                         recent_logs=recent_logs)
 
 
 @admin_bp.route('/doctors')
@@ -67,7 +94,9 @@ def add_doctor():
     if form.validate_on_submit():
         doctor = Doctor(
             name=form.name.data,
-            specialization=form.specialization.data
+            specialization=form.specialization.data,
+            available_days=form.available_days.data if form.available_days.data else None,
+            available_time=form.available_time.data if form.available_time.data else None
         )
         db.session.add(doctor)
         db.session.commit()
@@ -89,6 +118,8 @@ def edit_doctor(doctor_id):
     if form.validate_on_submit():
         doctor.name = form.name.data
         doctor.specialization = form.specialization.data
+        doctor.available_days = form.available_days.data if form.available_days.data else None
+        doctor.available_time = form.available_time.data if form.available_time.data else None
         db.session.commit()
         
         flash(f'Doctor {doctor.name} updated successfully!', 'success')
@@ -98,6 +129,8 @@ def edit_doctor(doctor_id):
     elif request.method == 'GET':
         form.name.data = doctor.name
         form.specialization.data = doctor.specialization
+        form.available_days.data = doctor.available_days
+        form.available_time.data = doctor.available_time
     
     return render_template('admin/edit_doctor.html', form=form, doctor=doctor)
 
@@ -171,7 +204,16 @@ def update_appointment_status(appointment_id, status):
         flash('Invalid status.', 'danger')
         return redirect(url_for('admin.appointments'))
     
+    old_status = appointment.status
     appointment.status = status
+    db.session.commit()
+    
+    # Log activity
+    log = ActivityLog(
+        user_id=current_user.id,
+        action=f'Admin updated appointment #{appointment.id} (Patient: {appointment.patient.name}) from {old_status} to {status}'
+    )
+    db.session.add(log)
     db.session.commit()
     
     flash(f'Appointment #{appointment.id} status updated to {status}.', 'success')
@@ -190,3 +232,71 @@ def delete_appointment(appointment_id):
     
     flash(f'Appointment #{appointment.id} deleted successfully!', 'info')
     return redirect(url_for('admin.appointments'))
+
+@admin_bp.route('/announcements')
+@login_required
+@admin_required
+def announcements():
+    """View all announcements"""
+    all_announcements = Announcement.query.order_by(Announcement.created_at.desc()).all()
+    return render_template('admin/announcements.html', announcements=all_announcements)
+
+
+@admin_bp.route('/add-announcement', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_announcement():
+    """Create new announcement"""
+    form = AnnouncementForm()
+    
+    if form.validate_on_submit():
+        announcement = Announcement(
+            title=form.title.data,
+            message=form.message.data
+        )
+        db.session.add(announcement)
+        db.session.commit()
+        
+        flash('Announcement posted successfully!', 'success')
+        return redirect(url_for('admin.announcements'))
+    
+    return render_template('admin/add_announcement.html', form=form)
+
+
+@admin_bp.route('/delete-announcement/<int:announcement_id>')
+@login_required
+@admin_required
+def delete_announcement(announcement_id):
+    """Delete announcement"""
+    announcement = Announcement.query.get_or_404(announcement_id)
+    
+    db.session.delete(announcement)
+    db.session.commit()
+    
+    flash(f'Announcement "{announcement.title}" deleted successfully!', 'info')
+    return redirect(url_for('admin.announcements'))
+
+
+@admin_bp.route('/activity-logs')
+@login_required
+@admin_required
+def activity_logs():
+    """View all activity logs"""
+    from datetime import datetime
+    
+    # Get all logs, ordered by most recent first
+    logs = ActivityLog.query.order_by(ActivityLog.timestamp.desc()).limit(100).all()
+    
+    # Calculate statistics
+    registration_count = sum(1 for log in logs if 'registered' in log.action)
+    booking_count = sum(1 for log in logs if 'booked' in log.action)
+    cancellation_count = sum(1 for log in logs if 'cancelled' in log.action)
+    admin_update_count = sum(1 for log in logs if 'Admin updated' in log.action)
+    
+    return render_template('admin/activity_logs.html', 
+                         logs=logs, 
+                         now=datetime.now(),
+                         registration_count=registration_count,
+                         booking_count=booking_count,
+                         cancellation_count=cancellation_count,
+                         admin_update_count=admin_update_count)

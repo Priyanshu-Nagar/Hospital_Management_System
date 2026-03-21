@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DateTimeLocalField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DateTimeLocalField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
+from wtforms.widgets import TextArea
 from models import User
 
 
@@ -55,4 +56,26 @@ class DoctorForm(FlaskForm):
         DataRequired(),
         Length(min=2, max=100)
     ])
+    available_days = StringField('Available Days', validators=[
+        Length(max=100)
+    ])
+    available_time = StringField('Available Time', validators=[
+        Length(max=100)
+    ])
     submit = SubmitField('Save Doctor')
+
+
+class AnnouncementForm(FlaskForm):
+    """Announcement creation form"""
+    title = StringField('Announcement Title', validators=[
+        DataRequired(),
+        Length(min=5, max=200)
+    ])
+    message = StringField('Message', 
+        widget=TextArea(),
+        validators=[
+            DataRequired(),
+            Length(min=10, max=1000)
+        ]
+    )
+    submit = SubmitField('Post Announcement')

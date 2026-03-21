@@ -10,6 +10,38 @@
         </h2>
         <p class="lead">Browse our qualified medical professionals</p>
         
+        <!-- Search Box -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('user.doctors') }}">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <input type="text" 
+                                   name="search" 
+                                   class="form-control" 
+                                   placeholder="Search by doctor name or specialization (e.g., Cardio, Dr. Smith)" 
+                                   value="{{ search_query if search_query else '' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                {% if search_query %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            Searching for: <strong>{{ search_query }}</strong>
+                            <a href="{{ url_for('user.doctors') }}" class="ms-2">
+                                <i class="bi bi-x-circle"></i> Clear search
+                            </a>
+                        </small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
         <div class="mb-3">
             <a href="{{ url_for('user.book_appointment') }}" class="btn btn-success">
                 <i class="bi bi-calendar-plus"></i> Book Appointment
@@ -20,6 +52,13 @@
 
 <div class="row mt-4">
     {% if doctors %}
+        <div class="col-md-12 mb-3">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> 
+                Found <strong>{{ doctors|length }}</strong> doctor(s)
+                {% if search_query %}matching "{{ search_query }}"{% endif %}
+            </div>
+        </div>
         {% for doctor in doctors %}
         <div class="col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
@@ -28,9 +67,28 @@
                         <i class="bi bi-person-circle display-1 text-primary"></i>
                     </div>
                     <h5 class="card-title text-center">{{ doctor.name }}</h5>
-                    <p class="text-center text-muted">
+                    <p class="text-center text-muted mb-2">
                         <i class="bi bi-hospital"></i> {{ doctor.specialization }}
                     </p>
+                    
+                    <!-- Availability Information -->
+                    {% if doctor.available_days or doctor.available_time %}
+                        <div class="text-center small mb-2">
+                            {% if doctor.available_days %}
+                                <div class="mb-1">
+                                    <i class="bi bi-calendar-week text-success"></i>
+                                    <strong>Days:</strong> {{ doctor.available_days }}
+                                </div>
+                            {% endif %}
+                            {% if doctor.available_time %}
+                                <div>
+                                    <i class="bi bi-clock text-info"></i>
+                                    <strong>Time:</strong> {{ doctor.available_time }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    
                     <hr>
                     <div class="text-center">
                         <a href="{{ url_for('user.book_appointment') }}" class="btn btn-primary btn-sm">
@@ -44,7 +102,13 @@
     {% else %}
         <div class="col-md-12">
             <div class="alert alert-warning">
-                <i class="bi bi-exclamation-triangle"></i> No doctors available at the moment.
+                <i class="bi bi-exclamation-triangle"></i> 
+                {% if search_query %}
+                    No doctors found matching "{{ search_query }}". 
+                    <a href="{{ url_for('user.doctors') }}">View all doctors</a>
+                {% else %}
+                    No doctors available at the moment.
+                {% endif %}
             </div>
         </div>
     {% endif %}

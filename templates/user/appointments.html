@@ -66,14 +66,17 @@
                                     </td>
                                     <td>{{ apt.created_at.strftime('%d %b %Y') }}</td>
                                     <td>
+                                        <a href="{{ url_for('user.appointment_slip', appointment_id=apt.id) }}" 
+                                           class="btn btn-sm btn-info mb-1"
+                                           target="_blank">
+                                            <i class="bi bi-file-text"></i> View Slip
+                                        </a>
                                         {% if apt.status not in ['completed', 'cancelled'] %}
                                             <a href="{{ url_for('user.cancel_appointment', appointment_id=apt.id) }}" 
                                                class="btn btn-sm btn-danger"
                                                onclick="return confirm('Are you sure you want to cancel this appointment?')">
                                                 <i class="bi bi-trash"></i> Cancel
                                             </a>
-                                        {% else %}
-                                            <span class="text-muted">-</span>
                                         {% endif %}
                                     </td>
                                 </tr>

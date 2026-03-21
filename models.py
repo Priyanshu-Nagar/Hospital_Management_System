@@ -44,6 +44,8 @@ class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     specialization = db.Column(db.String(100), nullable=False)
+    available_days = db.Column(db.String(100), nullable=True)  # New field
+    available_time = db.Column(db.String(100), nullable=True)  # New field
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationship with appointments
@@ -66,3 +68,45 @@ class Appointment(db.Model):
     
     def __repr__(self):
         return f'<Appointment {self.id} - User: {self.user_id} - Doctor: {self.doctor_id} - Status: {self.status}>'
+    
+class Announcement(db.Model):
+    """Announcement model for hospital notices"""
+    __tablename__ = 'announcements'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Announcement {self.title}>'
+class MedicalRecord(db.Model):
+    """Medical Record model for storing user documents"""
+    __tablename__ = 'medical_records'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    file_name = db.Column(db.String(255), nullable=False)
+    file_path = db.Column(db.String(500), nullable=False)
+    file_type = db.Column(db.String(50), nullable=False)  # pdf, jpg, png, etc.
+    upload_date = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationship with user
+    user = db.relationship('User', backref=db.backref('medical_records', lazy=True, cascade='all, delete-orphan'))
+    
+    def __repr__(self):
+        return f'<MedicalRecord {self.file_name}>'
+class ActivityLog(db.Model):
+    """Activity Log model for tracking user actions"""
+    __tablename__ = 'activity_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Nullable for system actions
+    action = db.Column(db.String(500), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationship with user
+    user = db.relationship('User', backref=db.backref('activity_logs', lazy=True))
+    
+    def __repr__(self):
+        return f'<ActivityLog {self.action}>'

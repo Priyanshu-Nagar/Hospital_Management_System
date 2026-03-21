@@ -33,6 +33,12 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for('admin.appointments') }}">Appointments</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.announcements') }}">Announcements</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.activity_logs') }}">Activity Logs</a>
+                            </li>
                         {% else %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for('user.dashboard') }}">Dashboard</a>
@@ -42,6 +48,10 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for('user.appointments') }}">My Appointments</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('user.medical_records') }}">Medical Records</a>
                             </li>
                         {% endif %}
                         <li class="nav-item">
@@ -85,7 +95,7 @@
     <!-- Footer -->
     <footer class="bg-light text-center py-3 mt-5">
         <div class="container">
-            <p class="text-muted mb-0">&copy; 2024 Hospital Management System. College Project.</p>
+            <p class="text-muted mb-0">&copy; 2026 Hospital Management System. College Project.</p>
         </div>
     </footer>
 
