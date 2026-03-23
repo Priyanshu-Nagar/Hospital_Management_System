@@ -3,70 +3,515 @@
 {% block title %}Book Appointment - Hospital Management System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0"><i class="bi bi-calendar-plus"></i> Book New Appointment</h4>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('user.book_appointment') }}">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="mb-3">
-                        {{ form.doctor_id.label(class="form-label") }}
-                        {{ form.doctor_id(class="form-select" + (" is-invalid" if form.doctor_id.errors else "")) }}
-                        {% if form.doctor_id.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.doctor_id.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <small class="form-text text-muted">Choose your preferred doctor</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.date.label(class="form-label") }}
-                        {{ form.date(class="form-control" + (" is-invalid" if form.date.errors else "")) }}
-                        {% if form.date.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.date.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <small class="form-text text-muted">Select a future date and time for your appointment</small>
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
-                        <strong>Note:</strong> Your appointment will be in "Pending" status until confirmed by admin.
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        {{ form.submit(class="btn btn-success btn-lg") }}
-                        <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </form>
-            </div>
+<!-- Page Header -->
+<div class="page-header-centered">
+    <h1><i class="bi bi-calendar-plus-fill"></i> Book an Appointment</h1>
+    <p class="lead">Schedule your visit with one of our qualified doctors</p>
+</div>
+
+<!-- Booking Form Card -->
+<div class="form-container">
+    <div class="booking-card">
+        <div class="card-icon">
+            <i class="bi bi-calendar-heart"></i>
         </div>
         
-        <!-- Instructions Card -->
-        <div class="card mt-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Booking Instructions</h5>
+        <div class="card-header-custom">
+            <h2>New Appointment</h2>
+            <p>Fill in the details below to schedule your appointment</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('user.book_appointment') }}" class="booking-form">
+            {{ form.hidden_tag() }}
+            
+            <!-- Doctor Selection -->
+            <div class="form-group">
+                {{ form.doctor_id.label(class="form-label-custom") }}
+                <div class="input-wrapper">
+                    <i class="bi bi-person-badge input-icon"></i>
+                    {{ form.doctor_id(class="form-control-custom" + (" is-invalid" if form.doctor_id.errors else "")) }}
+                </div>
+                {% if form.doctor_id.errors %}
+                    <div class="error-message">
+                        {% for error in form.doctor_id.errors %}
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <small class="form-hint">Select the doctor you wish to consult</small>
             </div>
-            <div class="card-body">
-                <ul>
-                    <li>Select your preferred doctor from the dropdown</li>
-                    <li>Choose a future date and time for your appointment</li>
-                    <li>Wait for admin confirmation</li>
-                    <li>You will be notified once your appointment is confirmed</li>
-                    <li>You can cancel your appointment anytime before it's completed</li>
-                </ul>
+            
+            <!-- Date & Time Selection -->
+            <div class="form-group">
+                {{ form.date.label(class="form-label-custom") }}
+                <div class="input-wrapper">
+                    <i class="bi bi-calendar-event input-icon"></i>
+                    {{ form.date(class="form-control-custom" + (" is-invalid" if form.date.errors else "")) }}
+                </div>
+                {% if form.date.errors %}
+                    <div class="error-message">
+                        {% for error in form.date.errors %}
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <small class="form-hint">Choose a future date and time for your appointment</small>
+            </div>
+            
+            <!-- Important Notice -->
+            <div class="info-box">
+                <div class="info-icon">
+                    <i class="bi bi-info-circle-fill"></i>
+                </div>
+                <div class="info-content">
+                    <h6>Please Note</h6>
+                    <ul>
+                        <li>Your appointment will be marked as <strong>"Pending"</strong> until confirmed by our team</li>
+                        <li>You will receive a confirmation notification once approved</li>
+                        <li>You can cancel or reschedule from "My Appointments" section</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="form-actions">
+                {{ form.submit(class="btn-submit") }}
+                <a href="{{ url_for('user.dashboard') }}" class="btn-cancel">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Help Section -->
+    <div class="help-card">
+        <h6><i class="bi bi-lightbulb-fill"></i> Booking Tips</h6>
+        <div class="help-items">
+            <div class="help-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Check doctor's availability before booking</span>
+            </div>
+            <div class="help-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Arrive 15 minutes before your appointment time</span>
+            </div>
+            <div class="help-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Bring all relevant medical documents</span>
+            </div>
+            <div class="help-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Contact us if you need to reschedule</span>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Page Header Centered */
+.page-header-centered {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.page-header-centered h1 {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 32px;
+    color: var(--gray-900);
+}
+
+.page-header-centered h1 i {
+    color: var(--primary);
+}
+
+.page-header-centered .lead {
+    margin: 0;
+    font-size: 16px;
+    color: var(--gray-600);
+}
+
+/* Form Container */
+.form-container {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+/* Booking Card */
+.booking-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--gray-200);
+    padding: 40px;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.card-icon {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+}
+
+.card-icon i {
+    font-size: 28px;
+    color: white;
+}
+
+.card-header-custom {
+    text-align: center;
+    margin-bottom: 32px;
+    margin-top: 20px;
+}
+
+.card-header-custom h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+}
+
+.card-header-custom p {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Booking Form */
+.booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label-custom {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.form-control-custom {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    font-size: 15px;
+    font-family: var(--font-family);
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    transition: all 0.2s;
+    appearance: none;
+}
+
+.form-control-custom:hover {
+    border-color: var(--gray-300);
+    background: white;
+}
+
+.form-control-custom:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.form-control-custom.is-invalid {
+    border-color: var(--danger);
+    background: var(--danger-light);
+}
+
+.form-control-custom.is-invalid:focus {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+/* Select Styling */
+select.form-control-custom {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 48px;
+}
+
+/* Date/Time Input */
+input[type="datetime-local"].form-control-custom {
+    cursor: pointer;
+}
+
+.form-hint {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin-top: 4px;
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 4px;
+}
+
+.error-message i {
+    font-size: 14px;
+}
+
+/* Info Box */
+.info-box {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    background: var(--info-light);
+    border-radius: 12px;
+    border-left: 4px solid var(--info);
+}
+
+.info-icon {
+    flex-shrink: 0;
+}
+
+.info-icon i {
+    font-size: 24px;
+    color: var(--info);
+}
+
+.info-content h6 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 8px 0;
+}
+
+.info-content ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.info-content li {
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin-bottom: 4px;
+}
+
+.info-content li:last-child {
+    margin-bottom: 0;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn-submit {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    font-family: var(--font-family);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit::before {
+    content: '\F62D';
+    font-family: 'bootstrap-icons';
+    font-size: 18px;
+}
+
+.btn-cancel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: var(--gray-200);
+    color: var(--gray-900);
+}
+
+/* Help Card */
+.help-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+}
+
+.help-card h6 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 16px;
+}
+
+.help-card h6 i {
+    color: var(--warning);
+    font-size: 18px;
+}
+
+.help-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.help-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.5;
+}
+
+.help-item i {
+    color: var(--success);
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .booking-card {
+        padding: 32px 24px;
+    }
+
+    .card-icon {
+        width: 56px;
+        height: 56px;
+        top: -28px;
+    }
+
+    .card-icon i {
+        font-size: 24px;
+    }
+
+    .page-header-centered h1 {
+        font-size: 28px;
+    }
+
+    .card-header-custom h2 {
+        font-size: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-cancel {
+        order: 2;
+    }
+
+    .info-box {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-card {
+        padding: 24px 20px;
+        border-radius: 12px;
+    }
+
+    .form-container {
+        padding: 0 12px;
+    }
+
+    .page-header-centered h1 {
+        font-size: 24px;
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+/* Loading State */
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Focus Visible for Accessibility */
+.form-control-custom:focus-visible,
+.btn-submit:focus-visible,
+.btn-cancel:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+</style>
 {% endblock %}

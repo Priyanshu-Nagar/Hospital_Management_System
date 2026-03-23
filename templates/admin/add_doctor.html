@@ -3,73 +3,560 @@
 {% block title %}Add Doctor - Hospital Management System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Add New Doctor</h4>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('admin.add_doctor') }}">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="mb-3">
-                        {{ form.name.label(class="form-label") }}
-                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), placeholder="Enter doctor's full name") }}
-                        {% if form.name.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.name.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.specialization.label(class="form-label") }}
-                        {{ form.specialization(class="form-control" + (" is-invalid" if form.specialization.errors else ""), placeholder="e.g., Cardiologist, Pediatrician") }}
-                        {% if form.specialization.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.specialization.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.available_days.label(class="form-label") }}
-                        {{ form.available_days(class="form-control" + (" is-invalid" if form.available_days.errors else ""), placeholder="e.g., Mon-Fri, Mon/Wed/Fri") }}
-                        {% if form.available_days.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.available_days.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <small class="form-text text-muted">Optional: Days when doctor is available</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.available_time.label(class="form-label") }}
-                        {{ form.available_time(class="form-control" + (" is-invalid" if form.available_time.errors else ""), placeholder="e.g., 10:00 AM - 2:00 PM") }}
-                        {% if form.available_time.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.available_time.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <small class="form-text text-muted">Optional: Time slots when doctor is available</small>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        {{ form.submit(class="btn btn-success btn-lg") }}
-                        <a href="{{ url_for('admin.doctors') }}" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </div>
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-person-plus-fill"></i> Add New Doctor</h1>
+        <p class="lead">Create a new doctor profile in the system</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('admin.doctors') }}" class="btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Doctors
+        </a>
     </div>
 </div>
+
+<!-- Form Container -->
+<div class="form-container">
+    <div class="form-card">
+        <!-- Card Icon -->
+        <div class="card-icon">
+            <i class="bi bi-person-badge"></i>
+        </div>
+
+        <!-- Form Header -->
+        <div class="form-header">
+            <h2>Doctor Information</h2>
+            <p>Fill in the details below to add a new doctor to the system</p>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" action="{{ url_for('admin.add_doctor') }}" class="doctor-form">
+            {{ form.hidden_tag() }}
+
+            <!-- Section 1: Basic Information -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3><i class="bi bi-info-circle-fill"></i> Basic Information</h3>
+                    <p>Essential details about the doctor</p>
+                </div>
+
+                <!-- Doctor Name -->
+                <div class="form-group">
+                    {{ form.name.label(class="form-label") }}
+                    <div class="input-wrapper">
+                        <i class="bi bi-person input-icon"></i>
+                        {{ form.name(class="form-input" + (" is-invalid" if form.name.errors else ""), placeholder="Enter doctor's full name") }}
+                    </div>
+                    {% if form.name.errors %}
+                        <div class="error-message">
+                            {% for error in form.name.errors %}
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="form-hint">e.g., Dr. John Smith</small>
+                </div>
+
+                <!-- Specialization -->
+                <div class="form-group">
+                    {{ form.specialization.label(class="form-label") }}
+                    <div class="input-wrapper">
+                        <i class="bi bi-hospital input-icon"></i>
+                        {{ form.specialization(class="form-input" + (" is-invalid" if form.specialization.errors else ""), placeholder="Enter medical specialization") }}
+                    </div>
+                    {% if form.specialization.errors %}
+                        <div class="error-message">
+                            {% for error in form.specialization.errors %}
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="form-hint">e.g., Cardiologist, Neurologist, Pediatrician</small>
+                </div>
+            </div>
+
+            <!-- Section Divider -->
+            <div class="section-divider"></div>
+
+            <!-- Section 2: Availability Information -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3><i class="bi bi-calendar-check-fill"></i> Availability Information</h3>
+                    <p>When is the doctor available for appointments? (Optional)</p>
+                </div>
+
+                <!-- Available Days -->
+                <div class="form-group">
+                    {{ form.available_days.label(class="form-label") }}
+                    <div class="input-wrapper">
+                        <i class="bi bi-calendar-week input-icon"></i>
+                        {{ form.available_days(class="form-input", placeholder="e.g., Monday - Friday") }}
+                    </div>
+                    {% if form.available_days.errors %}
+                        <div class="error-message">
+                            {% for error in form.available_days.errors %}
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="form-hint">Specify working days (leave blank if not applicable)</small>
+                </div>
+
+                <!-- Available Time -->
+                <div class="form-group">
+                    {{ form.available_time.label(class="form-label") }}
+                    <div class="input-wrapper">
+                        <i class="bi bi-clock input-icon"></i>
+                        {{ form.available_time(class="form-input", placeholder="e.g., 9:00 AM - 5:00 PM") }}
+                    </div>
+                    {% if form.available_time.errors %}
+                        <div class="error-message">
+                            {% for error in form.available_time.errors %}
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="form-hint">Specify working hours (leave blank if not applicable)</small>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <div class="info-icon">
+                    <i class="bi bi-lightbulb-fill"></i>
+                </div>
+                <div class="info-content">
+                    <h6>Quick Tips</h6>
+                    <ul>
+                        <li>Ensure the doctor's name is spelled correctly</li>
+                        <li>Use standard medical specialization names</li>
+                        <li>Availability information helps patients book appointments</li>
+                        <li>You can edit these details later if needed</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                {{ form.submit(class="btn-submit") }}
+                <a href="{{ url_for('admin.doctors') }}" class="btn-cancel">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 32px;
+}
+
+.page-header h1 i {
+    color: var(--primary);
+}
+
+.page-header .lead {
+    margin: 0;
+}
+
+.page-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Form Container */
+.form-container {
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+/* Form Card */
+.form-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--gray-200);
+    padding: 40px;
+    position: relative;
+}
+
+/* Card Icon */
+.card-icon {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+}
+
+.card-icon i {
+    font-size: 28px;
+    color: white;
+}
+
+/* Form Header */
+.form-header {
+    text-align: center;
+    margin-bottom: 32px;
+    margin-top: 20px;
+}
+
+.form-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+}
+
+.form-header p {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Doctor Form */
+.doctor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* Form Section */
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section-header {
+    margin-bottom: 8px;
+}
+
+.section-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.section-header h3 i {
+    color: var(--primary);
+    font-size: 20px;
+}
+
+.section-header p {
+    font-size: 13px;
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Section Divider */
+.section-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gray-200), transparent);
+    margin: 8px 0;
+}
+
+/* Form Group */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 4px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    font-size: 15px;
+    font-family: var(--font-family);
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    transition: all 0.2s;
+}
+
+.form-input:hover {
+    border-color: var(--gray-300);
+    background: white;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.form-input::placeholder {
+    color: var(--gray-400);
+}
+
+.form-input.is-invalid {
+    border-color: var(--danger);
+    background: var(--danger-light);
+}
+
+.form-input.is-invalid:focus {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.form-hint {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin-top: 4px;
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 4px;
+}
+
+.error-message i {
+    font-size: 14px;
+}
+
+/* Info Box */
+.info-box {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    background: var(--success-light);
+    border-radius: 12px;
+    border-left: 4px solid var(--success);
+}
+
+.info-icon {
+    flex-shrink: 0;
+}
+
+.info-icon i {
+    font-size: 24px;
+    color: var(--success);
+}
+
+.info-content h6 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 8px 0;
+}
+
+.info-content ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.info-content li {
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin-bottom: 4px;
+}
+
+.info-content li:last-child {
+    margin-bottom: 0;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn-submit {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    font-family: var(--font-family);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit::before {
+    content: '\F4FE';
+    font-family: 'bootstrap-icons';
+    font-size: 18px;
+}
+
+.btn-cancel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: var(--gray-200);
+    color: var(--gray-900);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .page-actions {
+        width: 100%;
+    }
+
+    .page-actions .btn-secondary {
+        width: 100%;
+    }
+
+    .form-card {
+        padding: 32px 24px;
+    }
+
+    .card-icon {
+        width: 56px;
+        height: 56px;
+        top: -28px;
+    }
+
+    .card-icon i {
+        font-size: 24px;
+    }
+
+    .page-header h1 {
+        font-size: 28px;
+    }
+
+    .form-header h2 {
+        font-size: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-cancel {
+        order: 2;
+    }
+
+    .info-box {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-card {
+        padding: 24px 20px;
+        border-radius: 12px;
+    }
+
+    .form-container {
+        padding: 0 12px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .section-header h3 {
+        font-size: 16px;
+    }
+}
+
+/* Focus Visible for Accessibility */
+.form-input:focus-visible,
+.btn-submit:focus-visible,
+.btn-cancel:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Loading State */
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+</style>
 {% endblock %}

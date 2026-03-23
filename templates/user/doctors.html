@@ -3,114 +3,564 @@
 {% block title %}Doctors - Hospital Management System{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h2 class="mb-4">
-            <i class="bi bi-person-badge"></i> Our Doctors
-        </h2>
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-person-badge-fill"></i> Our Doctors</h1>
         <p class="lead">Browse our qualified medical professionals</p>
-        
-        <!-- Search Box -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="GET" action="{{ url_for('user.doctors') }}">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <input type="text" 
-                                   name="search" 
-                                   class="form-control" 
-                                   placeholder="Search by doctor name or specialization (e.g., Cardio, Dr. Smith)" 
-                                   value="{{ search_query if search_query else '' }}">
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="bi bi-search"></i> Search
-                            </button>
-                        </div>
-                    </div>
-                </form>
-                {% if search_query %}
-                    <div class="mt-2">
-                        <small class="text-muted">
-                            Searching for: <strong>{{ search_query }}</strong>
-                            <a href="{{ url_for('user.doctors') }}" class="ms-2">
-                                <i class="bi bi-x-circle"></i> Clear search
-                            </a>
-                        </small>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="mb-3">
-            <a href="{{ url_for('user.book_appointment') }}" class="btn btn-success">
-                <i class="bi bi-calendar-plus"></i> Book Appointment
-            </a>
-        </div>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('user.book_appointment') }}" class="btn-primary">
+            <i class="bi bi-calendar-plus"></i> Book Appointment
+        </a>
     </div>
 </div>
 
-<div class="row mt-4">
-    {% if doctors %}
-        <div class="col-md-12 mb-3">
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> 
-                Found <strong>{{ doctors|length }}</strong> doctor(s)
-                {% if search_query %}matching "{{ search_query }}"{% endif %}
-            </div>
-        </div>
-        {% for doctor in doctors %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <div class="text-center mb-3">
-                        <i class="bi bi-person-circle display-1 text-primary"></i>
-                    </div>
-                    <h5 class="card-title text-center">{{ doctor.name }}</h5>
-                    <p class="text-center text-muted mb-2">
-                        <i class="bi bi-hospital"></i> {{ doctor.specialization }}
-                    </p>
-                    
-                    <!-- Availability Information -->
-                    {% if doctor.available_days or doctor.available_time %}
-                        <div class="text-center small mb-2">
-                            {% if doctor.available_days %}
-                                <div class="mb-1">
-                                    <i class="bi bi-calendar-week text-success"></i>
-                                    <strong>Days:</strong> {{ doctor.available_days }}
-                                </div>
-                            {% endif %}
-                            {% if doctor.available_time %}
-                                <div>
-                                    <i class="bi bi-clock text-info"></i>
-                                    <strong>Time:</strong> {{ doctor.available_time }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                    
-                    <hr>
-                    <div class="text-center">
-                        <a href="{{ url_for('user.book_appointment') }}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-calendar-check"></i> Book Appointment
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    {% else %}
-        <div class="col-md-12">
-            <div class="alert alert-warning">
-                <i class="bi bi-exclamation-triangle"></i> 
-                {% if search_query %}
-                    No doctors found matching "{{ search_query }}". 
-                    <a href="{{ url_for('user.doctors') }}">View all doctors</a>
-                {% else %}
-                    No doctors available at the moment.
-                {% endif %}
-            </div>
-        </div>
+<!-- Search Bar -->
+<div class="search-section">
+    <div class="search-box">
+        <i class="bi bi-search search-icon"></i>
+        <form method="GET" action="{{ url_for('user.doctors') }}" class="search-form">
+            <input type="text" 
+                   name="search" 
+                   class="search-input" 
+                   placeholder="Search by doctor name or specialization (e.g., Cardio, Dr. Smith)" 
+                   value="{{ search_query if search_query else '' }}"
+                   autocomplete="off">
+            <button type="submit" class="btn-primary search-btn">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </form>
+    </div>
+    
+    {% if search_query %}
+    <div class="search-results-info">
+        <span class="results-text">
+            <i class="bi bi-funnel"></i>
+            Showing results for "<strong>{{ search_query }}</strong>"
+        </span>
+        <a href="{{ url_for('user.doctors') }}" class="clear-search">
+            <i class="bi bi-x-circle"></i> Clear search
+        </a>
+    </div>
     {% endif %}
 </div>
+
+<!-- Results Count -->
+{% if doctors %}
+<div class="results-count">
+    <i class="bi bi-person-check-fill"></i>
+    Found <strong>{{ doctors|length }}</strong> doctor{{ 's' if doctors|length != 1 else '' }}
+    {% if search_query %}matching your search{% endif %}
+</div>
+{% endif %}
+
+<!-- Doctors Grid -->
+{% if doctors %}
+<div class="doctors-grid">
+    {% for doctor in doctors %}
+    <div class="doctor-card">
+        <div class="doctor-card-header">
+            <div class="doctor-avatar">
+                <i class="bi bi-person-circle"></i>
+            </div>
+            <div class="doctor-badge">
+                <i class="bi bi-patch-check-fill"></i>
+            </div>
+        </div>
+        
+        <div class="doctor-card-body">
+            <h3 class="doctor-name">{{ doctor.name }}</h3>
+            
+            <div class="doctor-specialization">
+                <i class="bi bi-hospital"></i>
+                <span>{{ doctor.specialization }}</span>
+            </div>
+            
+            {% if doctor.available_days or doctor.available_time %}
+            <div class="doctor-availability">
+                <div class="availability-label">
+                    <i class="bi bi-calendar-check"></i>
+                    <span>Availability</span>
+                </div>
+                
+                {% if doctor.available_days %}
+                <div class="availability-item">
+                    <i class="bi bi-calendar-week"></i>
+                    <span>{{ doctor.available_days }}</span>
+                </div>
+                {% endif %}
+                
+                {% if doctor.available_time %}
+                <div class="availability-item">
+                    <i class="bi bi-clock"></i>
+                    <span>{{ doctor.available_time }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="doctor-card-footer">
+            <a href="{{ url_for('user.book_appointment') }}" class="btn-book">
+                <i class="bi bi-calendar-plus"></i>
+                Book Appointment
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Empty State -->
+<div class="empty-state">
+    <div class="empty-state-icon">
+        {% if search_query %}
+            <i class="bi bi-search"></i>
+        {% else %}
+            <i class="bi bi-person-x"></i>
+        {% endif %}
+    </div>
+    <h3>
+        {% if search_query %}
+            No Doctors Found
+        {% else %}
+            No Doctors Available
+        {% endif %}
+    </h3>
+    <p>
+        {% if search_query %}
+            We couldn't find any doctors matching "{{ search_query }}".
+            <br>Try searching with a different term.
+        {% else %}
+            No doctors are currently available in our system.
+        {% endif %}
+    </p>
+    {% if search_query %}
+    <a href="{{ url_for('user.doctors') }}" class="btn-primary">
+        <i class="bi bi-arrow-left"></i> View All Doctors
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<style>
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 32px;
+}
+
+.page-header h1 i {
+    color: var(--primary);
+}
+
+.page-header .lead {
+    margin: 0;
+}
+
+.page-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Search Section */
+.search-section {
+    margin-bottom: 32px;
+}
+
+.search-box {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+}
+
+.search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 20px;
+    pointer-events: none;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 8px 8px 56px;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: var(--gray-900);
+    background: transparent;
+    padding: 12px 0;
+}
+
+.search-input::placeholder {
+    color: var(--gray-400);
+}
+
+.search-btn {
+    flex-shrink: 0;
+    padding: 12px 24px;
+    border-radius: 8px;
+}
+
+.search-results-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding: 12px 20px;
+    background: var(--primary-light);
+    border-radius: 8px;
+}
+
+.results-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--gray-700);
+}
+
+.results-text i {
+    color: var(--primary);
+}
+
+.clear-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-700);
+    transition: all 0.2s;
+}
+
+.clear-search:hover {
+    background: var(--gray-100);
+    color: var(--danger);
+}
+
+/* Results Count */
+.results-count {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+.results-count i {
+    color: var(--success);
+    font-size: 18px;
+}
+
+/* Doctors Grid */
+.doctors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+}
+
+/* Doctor Card */
+.doctor-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.doctor-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
+}
+
+.doctor-card-header {
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+    padding: 32px 24px 24px;
+    text-align: center;
+}
+
+.doctor-avatar {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-avatar i {
+    font-size: 64px;
+    color: var(--primary);
+}
+
+.doctor-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-badge i {
+    font-size: 18px;
+    color: var(--success);
+}
+
+.doctor-card-body {
+    padding: 24px;
+    flex: 1;
+}
+
+.doctor-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 12px 0;
+    text-align: center;
+}
+
+.doctor-specialization {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--gray-50);
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.doctor-specialization i {
+    color: var(--primary);
+    font-size: 16px;
+}
+
+.doctor-specialization span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.doctor-availability {
+    padding: 16px;
+    background: var(--success-light);
+    border-radius: 8px;
+    border-left: 3px solid var(--success);
+}
+
+.availability-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.availability-label i {
+    color: var(--success);
+    font-size: 14px;
+}
+
+.availability-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--gray-700);
+}
+
+.availability-item i {
+    color: var(--success);
+    font-size: 14px;
+    width: 16px;
+}
+
+.availability-item:not(:last-child) {
+    border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.doctor-card-footer {
+    padding: 20px 24px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+}
+
+.btn-book {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-book:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-book i {
+    font-size: 16px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+}
+
+.empty-state-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state-icon i {
+    font-size: 56px;
+    color: var(--gray-400);
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 15px;
+    color: var(--gray-600);
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .page-actions {
+        width: 100%;
+    }
+
+    .page-actions .btn-primary {
+        width: 100%;
+    }
+
+    .doctors-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px;
+    }
+
+    .search-input {
+        padding: 12px 0 12px 44px;
+    }
+
+    .search-icon {
+        left: 12px;
+    }
+
+    .search-btn {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .search-results-info {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .clear-search {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .doctors-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    .doctors-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+</style>
 {% endblock %}

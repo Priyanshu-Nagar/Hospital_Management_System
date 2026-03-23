@@ -3,245 +3,879 @@
 {% block title %}Admin Dashboard - Hospital Management System{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h2 class="mb-4">
-            <i class="bi bi-speedometer2"></i> Admin Dashboard
-        </h2>
-        <p class="lead">Welcome, <strong>{{ current_user.name }}</strong>!</p>
+<!-- Page Header -->
+<div class="dashboard-header">
+    <div>
+        <h1><i class="bi bi-speedometer2"></i> Admin Dashboard</h1>
+        <p class="lead">Welcome back, <strong>{{ current_user.name }}</strong>! Here's what's happening today.</p>
+    </div>
+    <div class="header-actions">
+        <a href="{{ url_for('admin.add_doctor') }}" class="btn-primary">
+            <i class="bi bi-person-plus"></i> Add Doctor
+        </a>
+        <a href="{{ url_for('admin.announcements') }}" class="btn-secondary">
+            <i class="bi bi-megaphone"></i> Announcements
+        </a>
     </div>
 </div>
 
 <!-- Statistics Cards -->
-<div class="row mt-4">
-    <div class="col-md-3">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-people"></i> Total Patients
-                </h5>
-                <h2 class="card-text">{{ total_users }}</h2>
+<div class="stats-grid">
+    <!-- Total Patients -->
+    <div class="stat-card stat-primary">
+        <div class="stat-card-inner">
+            <div class="stat-info">
+                <div class="stat-label">Total Patients</div>
+                <div class="stat-value">{{ total_users }}</div>
+                <div class="stat-description">Registered users</div>
+            </div>
+            <div class="stat-icon">
+                <i class="bi bi-people-fill"></i>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-person-badge"></i> Total Doctors
-                </h5>
-                <h2 class="card-text">{{ total_doctors }}</h2>
-            </div>
+        <div class="stat-footer">
+            <a href="{{ url_for('admin.patients') }}">
+                View all patients <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-info mb-3">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-calendar-check"></i> Total Appointments
-                </h5>
-                <h2 class="card-text">{{ total_appointments }}</h2>
+
+    <!-- Total Doctors -->
+    <div class="stat-card stat-success">
+        <div class="stat-card-inner">
+            <div class="stat-info">
+                <div class="stat-label">Total Doctors</div>
+                <div class="stat-value">{{ total_doctors }}</div>
+                <div class="stat-description">Medical professionals</div>
+            </div>
+            <div class="stat-icon">
+                <i class="bi bi-person-badge-fill"></i>
             </div>
         </div>
+        <div class="stat-footer">
+            <a href="{{ url_for('admin.doctors') }}">
+                Manage doctors <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-warning mb-3">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-clock"></i> Pending
-                </h5>
-                <h2 class="card-text">{{ pending_appointments }}</h2>
+
+    <!-- Total Appointments -->
+    <div class="stat-card stat-info">
+        <div class="stat-card-inner">
+            <div class="stat-info">
+                <div class="stat-label">Total Appointments</div>
+                <div class="stat-value">{{ total_appointments }}</div>
+                <div class="stat-description">All time bookings</div>
             </div>
+            <div class="stat-icon">
+                <i class="bi bi-calendar-check-fill"></i>
+            </div>
+        </div>
+        <div class="stat-footer">
+            <a href="{{ url_for('admin.appointments') }}">
+                View appointments <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Pending Appointments -->
+    <div class="stat-card stat-warning">
+        <div class="stat-card-inner">
+            <div class="stat-info">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value">{{ pending_appointments }}</div>
+                <div class="stat-description">Awaiting confirmation</div>
+            </div>
+            <div class="stat-icon">
+                <i class="bi bi-clock-fill"></i>
+            </div>
+        </div>
+        <div class="stat-footer">
+            <a href="{{ url_for('admin.appointments') }}">
+                Review pending <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
     </div>
 </div>
 
-<!-- Appointment Status Cards -->
-<div class="row">
-    <div class="col-md-4">
-        <div class="card border-success mb-3">
-            <div class="card-body text-center">
-                <i class="bi bi-check-circle display-4 text-success"></i>
-                <h5 class="mt-2">Confirmed</h5>
-                <h3>{{ confirmed_appointments }}</h3>
+<!-- Appointment Status Overview -->
+<div class="overview-section">
+    <h2 class="section-title">
+        <i class="bi bi-bar-chart-fill"></i>
+        Appointment Status Overview
+    </h2>
+    <div class="overview-grid">
+        <div class="overview-card confirmed">
+            <div class="overview-icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <div class="overview-content">
+                <div class="overview-value">{{ confirmed_appointments }}</div>
+                <div class="overview-label">Confirmed</div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card border-info mb-3">
-            <div class="card-body text-center">
-                <i class="bi bi-check-all display-4 text-info"></i>
-                <h5 class="mt-2">Completed</h5>
-                <h3>{{ completed_appointments }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card border-danger mb-3">
-            <div class="card-body text-center">
-                <i class="bi bi-x-circle display-4 text-danger"></i>
-                <h5 class="mt-2">Cancelled</h5>
-                <h3>{{ cancelled_appointments }}</h3>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Quick Actions -->
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+        <div class="overview-card completed">
+            <div class="overview-icon">
+                <i class="bi bi-check-all"></i>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        <a href="{{ url_for('admin.add_doctor') }}" class="btn btn-success btn-lg w-100 mb-2">
-                            <i class="bi bi-person-plus"></i> Add Doctor
-                        </a>
-                    </div>
-                    <div class="col-md-3">
-                        <a href="{{ url_for('admin.doctors') }}" class="btn btn-info btn-lg w-100 mb-2">
-                            <i class="bi bi-person-badge"></i> Manage Doctors
-                        </a>
-                    </div>
-                    <div class="col-md-3">
-                        <a href="{{ url_for('admin.patients') }}" class="btn btn-primary btn-lg w-100 mb-2">
-                            <i class="bi bi-people"></i> View Patients
-                        </a>
-                    </div>
-                    <div class="col-md-3">
-                        <a href="{{ url_for('admin.appointments') }}" class="btn btn-warning btn-lg w-100 mb-2">
-                            <i class="bi bi-calendar-check"></i> Manage Appointments
-                        </a>
-                    </div>
-                </div>
+            <div class="overview-content">
+                <div class="overview-value">{{ completed_appointments }}</div>
+                <div class="overview-label">Completed</div>
+            </div>
+        </div>
+
+        <div class="overview-card cancelled">
+            <div class="overview-icon">
+                <i class="bi bi-x-circle-fill"></i>
+            </div>
+            <div class="overview-content">
+                <div class="overview-value">{{ cancelled_appointments }}</div>
+                <div class="overview-label">Cancelled</div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Charts Section -->
-<div class="row mt-4">
-    <!-- Appointments by Status Chart -->
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Appointments by Status</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="statusChart" height="250"></canvas>
-            </div>
+<div class="charts-section">
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3><i class="bi bi-pie-chart-fill"></i> Appointments by Status</h3>
+            <p>Distribution of all appointments</p>
+        </div>
+        <div class="chart-body">
+            <canvas id="statusChart" height="280"></canvas>
         </div>
     </div>
-    
-    <!-- Appointments per Day Chart -->
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Appointments (Last 7 Days)</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="dailyChart" height="250"></canvas>
-            </div>
+
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3><i class="bi bi-graph-up"></i> Appointments Trend (Last 7 Days)</h3>
+            <p>Daily appointment bookings</p>
         </div>
-    </div>
-</div>
-<!-- Recent Activity -->
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-activity"></i> Recent Activity</h5>
-            </div>
-            <div class="card-body">
-                <!-- {% set recent_logs = [] %} -->
-                {% if recent_logs %}
-                    <div class="list-group">
-                        {% for log in recent_logs[:5] %}
-                        <div class="list-group-item">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">
-                                    {% if log.user %}
-                                        {{ log.user.name }}
-                                    {% else %}
-                                        System
-                                    {% endif %}
-                                </h6>
-                                <small>{{ log.timestamp.strftime('%d %b, %I:%M %p') }}</small>
-                            </div>
-                            <p class="mb-1">{{ log.action }}</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="text-center mt-3">
-                        <a href="{{ url_for('admin.activity_logs') }}" class="btn btn-info">
-                            <i class="bi bi-eye"></i> View All Logs
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> No recent activity.
-                    </div>
-                {% endif %}
-            </div>
+        <div class="chart-body">
+            <canvas id="dailyChart" height="280"></canvas>
         </div>
     </div>
 </div>
 
-<!-- Recent Appointments -->
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Appointments</h5>
-            </div>
-            <div class="card-body">
-                {% if recent_appointments %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Patient</th>
-                                    <th>Doctor</th>
-                                    <th>Date & Time</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for apt in recent_appointments %}
-                                <tr>
-                                    <td>{{ apt.id }}</td>
-                                    <td>{{ apt.patient.name }}</td>
-                                    <td>{{ apt.doctor.name }}</td>
-                                    <td>{{ apt.date.strftime('%d %b %Y, %I:%M %p') }}</td>
-                                    <td>
-                                        {% if apt.status == 'pending' %}
-                                            <span class="badge bg-warning text-dark">Pending</span>
-                                        {% elif apt.status == 'confirmed' %}
-                                            <span class="badge bg-success">Confirmed</span>
-                                        {% elif apt.status == 'completed' %}
-                                            <span class="badge bg-info">Completed</span>
-                                        {% elif apt.status == 'cancelled' %}
-                                            <span class="badge bg-danger">Cancelled</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> No appointments yet.
-                    </div>
-                {% endif %}
-            </div>
+<!-- Recent Activity -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h3><i class="bi bi-activity"></i> Recent Activity</h3>
+            <a href="{{ url_for('admin.activity_logs') }}" class="btn-secondary btn-sm">
+                View All Logs
+            </a>
         </div>
     </div>
+    <div class="card-body">
+        {% if recent_logs %}
+            <div class="activity-list">
+                {% for log in recent_logs %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        {% if 'registered' in log.action %}
+                            <i class="bi bi-person-plus-fill text-success"></i>
+                        {% elif 'booked' in log.action %}
+                            <i class="bi bi-calendar-plus-fill text-primary"></i>
+                        {% elif 'cancelled' in log.action %}
+                            <i class="bi bi-x-circle-fill text-danger"></i>
+                        {% elif 'updated' in log.action %}
+                            <i class="bi bi-pencil-fill text-warning"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill text-info"></i>
+                        {% endif %}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-details">
+                            <span class="activity-user">
+                                {% if log.user %}
+                                    {{ log.user.name }}
+                                    {% if log.user.is_admin %}
+                                        <span class="badge bg-danger">Admin</span>
+                                    {% else %}
+                                        <span class="badge bg-primary">User</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">System</span>
+                                {% endif %}
+                            </span>
+                            <p class="activity-text">{{ log.action }}</p>
+                        </div>
+                        <div class="activity-time">
+                            <i class="bi bi-clock"></i>
+                            {{ log.timestamp.strftime('%d %b, %I:%M %p') }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-activity">
+                <i class="bi bi-info-circle"></i>
+                <p>No recent activity.</p>
+            </div>
+        {% endif %}
+    </div>
 </div>
+
+<!-- Recent Appointments -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h3><i class="bi bi-calendar-event"></i> Recent Appointments</h3>
+            <a href="{{ url_for('admin.appointments') }}" class="btn-secondary btn-sm">
+                View All
+            </a>
+        </div>
+    </div>
+    <div class="card-body appointments-table-wrapper">
+        {% if recent_appointments %}
+            <div class="table-responsive">
+                <table class="appointments-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for apt in recent_appointments %}
+                        <tr>
+                            <td><span class="id-badge">#{{ apt.id }}</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <i class="bi bi-person-circle"></i>
+                                    {{ apt.patient.name }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="doctor-info">
+                                    <i class="bi bi-person-badge"></i>
+                                    {{ apt.doctor.name }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-info">
+                                    <div>{{ apt.date.strftime('%d %b %Y') }}</div>
+                                    <small>{{ apt.date.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                {% if apt.status == 'pending' %}
+                                    <span class="status-badge status-pending">
+                                        <i class="bi bi-clock"></i> Pending
+                                    </span>
+                                {% elif apt.status == 'confirmed' %}
+                                    <span class="status-badge status-confirmed">
+                                        <i class="bi bi-check-circle"></i> Confirmed
+                                    </span>
+                                {% elif apt.status == 'completed' %}
+                                    <span class="status-badge status-completed">
+                                        <i class="bi bi-check-all"></i> Completed
+                                    </span>
+                                {% elif apt.status == 'cancelled' %}
+                                    <span class="status-badge status-cancelled">
+                                        <i class="bi bi-x-circle"></i> Cancelled
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ url_for('admin.update_appointment_status', appointment_id=apt.id, status='confirmed') }}" 
+                                       class="btn-action btn-confirm"
+                                       title="Confirm">
+                                        <i class="bi bi-check"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.update_appointment_status', appointment_id=apt.id, status='completed') }}" 
+                                       class="btn-action btn-complete"
+                                       title="Mark Complete">
+                                        <i class="bi bi-check-all"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-activity">
+                <i class="bi bi-calendar-x"></i>
+                <p>No appointments yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Dashboard Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.dashboard-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 32px;
+}
+
+.dashboard-header h1 i {
+    color: var(--primary);
+}
+
+.dashboard-header .lead {
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Statistics Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+/* Stat Card */
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-600);
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+    color: var(--gray-900);
+}
+
+.stat-description {
+    font-size: 13px;
+    color: var(--gray-500);
+}
+
+.stat-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    opacity: 0.9;
+}
+
+.stat-primary .stat-icon {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.stat-success .stat-icon {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.stat-info .stat-icon {
+    background: var(--info-light);
+    color: var(--info);
+}
+
+.stat-warning .stat-icon {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.stat-footer {
+    padding: 12px 24px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+}
+
+.stat-footer a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-700);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.stat-footer a:hover {
+    color: var(--primary);
+}
+
+.stat-footer a i {
+    transition: transform 0.2s;
+}
+
+.stat-footer a:hover i {
+    transform: translateX(4px);
+}
+
+/* Overview Section */
+.overview-section {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 16px;
+}
+
+.section-title i {
+    color: var(--primary);
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.overview-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+    transition: all 0.2s;
+}
+
+.overview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.overview-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.overview-card.confirmed .overview-icon {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.overview-card.completed .overview-icon {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.overview-card.cancelled .overview-icon {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.overview-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1;
+}
+
+.overview-label {
+    font-size: 13px;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+/* Charts Section */
+.charts-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+}
+
+.chart-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+.chart-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 4px 0;
+}
+
+.chart-header h3 i {
+    color: var(--primary);
+}
+
+.chart-header p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.chart-body {
+    padding: 24px;
+}
+
+/* Card Header Enhancement */
+.card-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.card-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 16px;
+}
+
+/* Activity List */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: var(--gray-50);
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.activity-item:hover {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.activity-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.activity-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.activity-details {
+    flex: 1;
+}
+
+.activity-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.activity-text {
+    margin: 0;
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.5;
+}
+
+.activity-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--gray-500);
+    white-space: nowrap;
+}
+
+.empty-activity {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-500);
+}
+
+.empty-activity i {
+    font-size: 36px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+/* Appointments Table */
+.appointments-table-wrapper {
+    padding: 0;
+}
+
+.appointments-table {
+    width: 100%;
+}
+
+.appointments-table thead {
+    background: var(--gray-50);
+}
+
+.appointments-table th {
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.appointments-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.appointments-table tr:hover {
+    background: var(--gray-50);
+}
+
+.id-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--gray-100);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.user-info,
+.doctor-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.user-info i {
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.doctor-info i {
+    color: var(--success);
+    font-size: 18px;
+}
+
+.date-info {
+    font-size: 14px;
+}
+
+.date-info small {
+    display: block;
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 2px;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-confirmed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-action {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-confirm {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.btn-confirm:hover {
+    background: var(--success);
+    color: white;
+}
+
+.btn-complete {
+    background: var(--info-light);
+    color: var(--info);
+}
+
+.btn-complete:hover {
+    background: var(--info);
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .header-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .header-actions .btn-primary,
+    .header-actions .btn-secondary {
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-value {
+        font-size: 32px;
+    }
+
+    .activity-item {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .activity-content {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .card-header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+</style>
 
 <!-- Chart.js CDN and Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -261,18 +895,13 @@
                     {{ cancelled_appointments }}
                 ],
                 backgroundColor: [
-                    '#ffc107',
-                    '#28a745',
-                    '#17a2b8',
-                    '#dc3545'
+                    '#fbbf24',
+                    '#3b82f6',
+                    '#10b981',
+                    '#ef4444'
                 ],
-                borderColor: [
-                    '#ffc107',
-                    '#28a745',
-                    '#17a2b8',
-                    '#dc3545'
-                ],
-                borderWidth: 2
+                borderWidth: 0,
+                hoverOffset: 8
             }]
         },
         options: {
@@ -282,21 +911,29 @@
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 15,
+                        padding: 20,
                         font: {
-                            size: 12
-                        }
+                            size: 13,
+                            family: 'Inter'
+                        },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
                     }
                 },
                 tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        family: 'Inter'
+                    },
+                    bodyFont: {
+                        size: 13,
+                        family: 'Inter'
+                    },
                     callbacks: {
                         label: function(context) {
-                            let label = context.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            label += context.parsed + ' appointments';
-                            return label;
+                            return context.label + ': ' + context.parsed + ' appointments';
                         }
                     }
                 }
@@ -311,18 +948,20 @@
         data: {
             labels: {{ day_labels | tojson }},
             datasets: [{
-                label: 'Appointments Booked',
+                label: 'Appointments',
                 data: {{ appointments_per_day | tojson }},
-                backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                borderColor: '#28a745',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                borderColor: '#2563eb',
                 borderWidth: 3,
                 tension: 0.4,
                 fill: true,
-                pointBackgroundColor: '#28a745',
+                pointBackgroundColor: '#2563eb',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
                 pointRadius: 5,
-                pointHoverRadius: 7
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor: '#2563eb',
+                pointHoverBorderWidth: 3
             }]
         },
         options: {
@@ -334,44 +973,48 @@
                     ticks: {
                         stepSize: 1,
                         font: {
-                            size: 11
-                        }
+                            size: 12,
+                            family: 'Inter'
+                        },
+                        color: '#64748b'
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
                     }
                 },
                 x: {
                     ticks: {
                         font: {
-                            size: 11
-                        }
+                            size: 12,
+                            family: 'Inter'
+                        },
+                        color: '#64748b'
                     },
                     grid: {
-                        display: false
+                        display: false,
+                        drawBorder: false
                     }
                 }
             },
             plugins: {
                 legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        font: {
-                            size: 12
-                        },
-                        padding: 15
-                    }
+                    display: false
                 },
                 tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        family: 'Inter'
+                    },
+                    bodyFont: {
+                        size: 13,
+                        family: 'Inter'
+                    },
                     callbacks: {
                         label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            label += context.parsed.y + ' appointment' + (context.parsed.y !== 1 ? 's' : '');
-                            return label;
+                            return context.parsed.y + ' appointment' + (context.parsed.y !== 1 ? 's' : '');
                         }
                     }
                 }

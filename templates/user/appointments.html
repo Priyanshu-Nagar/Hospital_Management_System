@@ -3,109 +3,629 @@
 {% block title %}My Appointments - Hospital Management System{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h2 class="mb-4">
-            <i class="bi bi-calendar-check"></i> My Appointments
-        </h2>
-        
-        <div class="mb-3">
-            <a href="{{ url_for('user.book_appointment') }}" class="btn btn-success">
-                <i class="bi bi-calendar-plus"></i> Book New Appointment
-            </a>
-            <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">
-                <i class="bi bi-speedometer2"></i> Dashboard
-            </a>
-        </div>
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-calendar-check-fill"></i> My Appointments</h1>
+        <p class="lead">View and manage all your appointments</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('user.dashboard') }}" class="btn-secondary">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{{ url_for('user.book_appointment') }}" class="btn-primary">
+            <i class="bi bi-calendar-plus"></i> Book New Appointment
+        </a>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-12">
-        {% if appointments %}
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Doctor</th>
-                                    <th>Specialization</th>
-                                    <th>Date & Time</th>
-                                    <th>Status</th>
-                                    <th>Booked On</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for apt in appointments %}
-                                <tr>
-                                    <td>{{ apt.id }}</td>
-                                    <td>{{ apt.doctor.name }}</td>
-                                    <td>{{ apt.doctor.specialization }}</td>
-                                    <td>{{ apt.date.strftime('%d %b %Y, %I:%M %p') }}</td>
-                                    <td>
-                                        {% if apt.status == 'pending' %}
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="bi bi-clock"></i> Pending
-                                            </span>
-                                        {% elif apt.status == 'confirmed' %}
-                                            <span class="badge bg-success">
-                                                <i class="bi bi-check-circle"></i> Confirmed
-                                            </span>
-                                        {% elif apt.status == 'completed' %}
-                                            <span class="badge bg-info">
-                                                <i class="bi bi-check-all"></i> Completed
-                                            </span>
-                                        {% elif apt.status == 'cancelled' %}
-                                            <span class="badge bg-danger">
-                                                <i class="bi bi-x-circle"></i> Cancelled
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ apt.created_at.strftime('%d %b %Y') }}</td>
-                                    <td>
-                                        <a href="{{ url_for('user.appointment_slip', appointment_id=apt.id) }}" 
-                                           class="btn btn-sm btn-info mb-1"
-                                           target="_blank">
-                                            <i class="bi bi-file-text"></i> View Slip
-                                        </a>
-                                        {% if apt.status not in ['completed', 'cancelled'] %}
-                                            <a href="{{ url_for('user.cancel_appointment', appointment_id=apt.id) }}" 
-                                               class="btn btn-sm btn-danger"
-                                               onclick="return confirm('Are you sure you want to cancel this appointment?')">
-                                                <i class="bi bi-trash"></i> Cancel
-                                            </a>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Legend -->
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h6>Status Legend:</h6>
-                    <span class="badge bg-warning text-dark me-2">Pending</span> Waiting for admin confirmation
-                    <span class="badge bg-success me-2 ms-3">Confirmed</span> Appointment confirmed by admin
-                    <span class="badge bg-info me-2 ms-3">Completed</span> Appointment completed
-                    <span class="badge bg-danger me-2 ms-3">Cancelled</span> Appointment cancelled
-                </div>
-            </div>
-        {% else %}
-            <div class="alert alert-info">
-                <h4><i class="bi bi-info-circle"></i> No Appointments Found</h4>
-                <p>You haven't booked any appointments yet.</p>
-                <a href="{{ url_for('user.book_appointment') }}" class="btn btn-success">
-                    <i class="bi bi-calendar-plus"></i> Book Your First Appointment
-                </a>
-            </div>
-        {% endif %}
+<!-- Status Legend -->
+{% if appointments %}
+<div class="status-legend">
+    <span class="legend-label">Status:</span>
+    <div class="legend-items">
+        <div class="legend-item">
+            <span class="status-badge status-pending">
+                <i class="bi bi-clock"></i> Pending
+            </span>
+            <span class="legend-text">Awaiting confirmation</span>
+        </div>
+        <div class="legend-item">
+            <span class="status-badge status-confirmed">
+                <i class="bi bi-check-circle"></i> Confirmed
+            </span>
+            <span class="legend-text">Appointment confirmed</span>
+        </div>
+        <div class="legend-item">
+            <span class="status-badge status-completed">
+                <i class="bi bi-check-all"></i> Completed
+            </span>
+            <span class="legend-text">Visit completed</span>
+        </div>
+        <div class="legend-item">
+            <span class="status-badge status-cancelled">
+                <i class="bi bi-x-circle"></i> Cancelled
+            </span>
+            <span class="legend-text">Appointment cancelled</span>
+        </div>
     </div>
 </div>
+{% endif %}
+
+<!-- Appointments Table -->
+{% if appointments %}
+<div class="card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <h5>
+                <i class="bi bi-list-check"></i>
+                All Appointments
+            </h5>
+            <div class="appointments-count">
+                <i class="bi bi-calendar3"></i>
+                <strong>{{ appointments|length }}</strong> appointment{{ 's' if appointments|length != 1 else '' }}
+            </div>
+        </div>
+    </div>
+    <div class="card-body table-wrapper">
+        <div class="table-responsive">
+            <table class="appointments-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Doctor</th>
+                        <th>Specialization</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Booked On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for apt in appointments %}
+                    <tr class="appointment-row">
+                        <td class="apt-id">
+                            <span class="id-badge">#{{ apt.id }}</span>
+                        </td>
+                        <td class="apt-doctor">
+                            <div class="doctor-info">
+                                <i class="bi bi-person-circle doctor-icon"></i>
+                                <span class="doctor-name">{{ apt.doctor.name }}</span>
+                            </div>
+                        </td>
+                        <td class="apt-specialization">
+                            <div class="specialization-badge">
+                                <i class="bi bi-hospital"></i>
+                                {{ apt.doctor.specialization }}
+                            </div>
+                        </td>
+                        <td class="apt-date">
+                            <div class="date-time">
+                                <div class="date">
+                                    <i class="bi bi-calendar3"></i>
+                                    {{ apt.date.strftime('%d %b %Y') }}
+                                </div>
+                                <div class="time">
+                                    <i class="bi bi-clock"></i>
+                                    {{ apt.date.strftime('%I:%M %p') }}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="apt-status">
+                            {% if apt.status == 'pending' %}
+                                <span class="status-badge status-pending">
+                                    <i class="bi bi-clock"></i> Pending
+                                </span>
+                            {% elif apt.status == 'confirmed' %}
+                                <span class="status-badge status-confirmed">
+                                    <i class="bi bi-check-circle"></i> Confirmed
+                                </span>
+                            {% elif apt.status == 'completed' %}
+                                <span class="status-badge status-completed">
+                                    <i class="bi bi-check-all"></i> Completed
+                                </span>
+                            {% elif apt.status == 'cancelled' %}
+                                <span class="status-badge status-cancelled">
+                                    <i class="bi bi-x-circle"></i> Cancelled
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="apt-booked">
+                            <div class="booked-date">
+                                {{ apt.created_at.strftime('%d %b %Y') }}
+                            </div>
+                        </td>
+                        <td class="apt-actions">
+                            <div class="action-buttons">
+                                <a href="{{ url_for('user.appointment_slip', appointment_id=apt.id) }}" 
+                                   class="btn-action btn-view"
+                                   target="_blank"
+                                   title="View Appointment Slip">
+                                    <i class="bi bi-file-text"></i>
+                                    <span>View Slip</span>
+                                </a>
+                                {% if apt.status not in ['completed', 'cancelled'] %}
+                                    <a href="{{ url_for('user.cancel_appointment', appointment_id=apt.id) }}" 
+                                       class="btn-action btn-cancel"
+                                       onclick="return confirm('Are you sure you want to cancel this appointment?')"
+                                       title="Cancel Appointment">
+                                        <i class="bi bi-x-circle"></i>
+                                        <span>Cancel</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Empty State -->
+<div class="empty-state">
+    <div class="empty-state-icon">
+        <i class="bi bi-calendar-x"></i>
+    </div>
+    <h3>No Appointments Yet</h3>
+    <p>You haven't booked any appointments yet. Get started by scheduling your first appointment with one of our qualified doctors.</p>
+    <a href="{{ url_for('user.book_appointment') }}" class="btn-primary btn-large">
+        <i class="bi bi-calendar-plus"></i> Book Your First Appointment
+    </a>
+</div>
+{% endif %}
+
+<style>
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 32px;
+}
+
+.page-header h1 i {
+    color: var(--primary);
+}
+
+.page-header .lead {
+    margin: 0;
+}
+
+.page-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Status Legend */
+.status-legend {
+    background: white;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 24px;
+}
+
+.legend-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 16px;
+}
+
+.legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-text {
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+/* Card Header Enhancement */
+.card-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.card-header h5 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.appointments-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.appointments-count i {
+    font-size: 16px;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+    padding: 0;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Appointments Table */
+.appointments-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.appointments-table thead {
+    background: var(--gray-50);
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.appointments-table thead th {
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.appointments-table tbody tr {
+    border-bottom: 1px solid var(--gray-200);
+    transition: background 0.2s;
+}
+
+.appointments-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.appointments-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.appointments-table tbody td {
+    padding: 20px;
+    font-size: 14px;
+    color: var(--gray-700);
+    vertical-align: middle;
+}
+
+/* Table Cell Styles */
+.apt-id {
+    width: 60px;
+}
+
+.id-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.doctor-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.doctor-icon {
+    font-size: 24px;
+    color: var(--primary);
+}
+
+.doctor-name {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.specialization-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.specialization-badge i {
+    font-size: 14px;
+}
+
+.date-time {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.date,
+.time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.date {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.date i {
+    color: var(--primary);
+}
+
+.time {
+    color: var(--gray-600);
+}
+
+.time i {
+    color: var(--gray-400);
+}
+
+.booked-date {
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge i {
+    font-size: 14px;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-confirmed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-view {
+    background: var(--info-light);
+    color: #164e63;
+}
+
+.btn-view:hover {
+    background: var(--info);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-cancel {
+    background: var(--danger-light);
+    color: #991b1b;
+}
+
+.btn-cancel:hover {
+    background: var(--danger);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-action i {
+    font-size: 14px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+}
+
+.empty-state-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state-icon i {
+    font-size: 56px;
+    color: var(--gray-400);
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 15px;
+    color: var(--gray-600);
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-large {
+    padding: 14px 28px;
+    font-size: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .page-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .page-actions .btn-secondary,
+    .page-actions .btn-primary {
+        width: 100%;
+    }
+
+    .status-legend {
+        padding: 16px;
+    }
+
+    .legend-items {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .appointments-table {
+        font-size: 13px;
+    }
+
+    .appointments-table thead th,
+    .appointments-table tbody td {
+        padding: 12px;
+    }
+
+    .appointments-table thead th {
+        font-size: 11px;
+    }
+
+    /* Stack action buttons on mobile */
+    .action-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .btn-action {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Hide some columns on mobile */
+    .apt-booked,
+    .apt-specialization {
+        display: none;
+    }
+
+    .card-header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Show minimal info on very small screens */
+    .doctor-icon,
+    .specialization-badge i,
+    .date i,
+    .time i {
+        display: none;
+    }
+
+    .appointments-count {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .page-actions,
+    .apt-actions,
+    .status-legend {
+        display: none;
+    }
+
+    .appointments-table {
+        box-shadow: none;
+    }
+}
+</style>
 {% endblock %}
