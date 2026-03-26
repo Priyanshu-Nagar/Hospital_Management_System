@@ -3,159 +3,663 @@
 {% block title %}Activity Logs - Hospital Management System{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h2 class="mb-4">
-            <i class="bi bi-clock-history"></i> Activity Logs
-        </h2>
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-clock-history"></i> Activity Logs</h1>
         <p class="lead">System activity and user action tracking</p>
-        
-        <div class="mb-3">
-            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
-                <i class="bi bi-speedometer2"></i> Dashboard
-            </a>
-        </div>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-secondary">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-12">
+<!-- Statistics -->
+{% if logs %}
+<div class="stats-summary">
+    <div class="summary-card">
+        <i class="bi bi-list-ul"></i>
+        <div class="summary-content">
+            <div class="summary-value">{{ logs|length }}</div>
+            <div class="summary-label">Total Logs Displayed</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <i class="bi bi-person-plus-fill"></i>
+        <div class="summary-content">
+            <div class="summary-value">{{ registration_count }}</div>
+            <div class="summary-label">User Registrations</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <i class="bi bi-calendar-plus-fill"></i>
+        <div class="summary-content">
+            <div class="summary-value">{{ booking_count }}</div>
+            <div class="summary-label">Appointments Booked</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <i class="bi bi-pencil-fill"></i>
+        <div class="summary-content">
+            <div class="summary-value">{{ admin_update_count }}</div>
+            <div class="summary-label">Admin Updates</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Activity Feed -->
+<div class="activity-section">
+    <div class="section-header">
+        <h2>
+            <i class="bi bi-activity"></i>
+            Recent Activity Feed
+        </h2>
         {% if logs %}
-            <div class="card shadow">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Recent Activities (Last 100 entries)</h5>
+        <div class="activity-count">
+            <i class="bi bi-clock-history"></i>
+            Last <strong>100</strong> entries
+        </div>
+        {% endif %}
+    </div>
+
+    {% if logs %}
+        <div class="activity-feed">
+            {% for log in logs %}
+            <div class="activity-item">
+                <div class="activity-timeline">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-line"></div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>#</th>
-                                    <th>User</th>
-                                    <th>Action</th>
-                                    <th>Timestamp</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for log in logs %}
-                                <tr>
-                                    <td>{{ log.id }}</td>
-                                    <td>
-                                        {% if log.user %}
-                                            <i class="bi bi-person-circle {% if log.user.is_admin %}text-danger{% else %}text-primary{% endif %}"></i>
-                                            {{ log.user.name }}
-                                            {% if log.user.is_admin %}
-                                                <span class="badge bg-danger">Admin</span>
-                                            {% else %}
-                                                <span class="badge bg-primary">User</span>
-                                            {% endif %}
-                                        {% else %}
-                                            <span class="text-muted">System</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if 'registered' in log.action %}
-                                            <i class="bi bi-person-plus-fill text-success"></i>
-                                        {% elif 'booked' in log.action %}
-                                            <i class="bi bi-calendar-plus-fill text-primary"></i>
-                                        {% elif 'cancelled' in log.action %}
-                                            <i class="bi bi-x-circle-fill text-danger"></i>
-                                        {% elif 'updated' in log.action %}
-                                            <i class="bi bi-pencil-fill text-warning"></i>
-                                        {% elif 'confirmed' in log.action %}
-                                            <i class="bi bi-check-circle-fill text-success"></i>
-                                        {% else %}
-                                            <i class="bi bi-info-circle-fill text-info"></i>
-                                        {% endif %}
-                                        {{ log.action }}
-                                    </td>
-                                    <td>
-                                        <i class="bi bi-clock"></i> 
-                                        {{ log.timestamp.strftime('%d %b %Y, %I:%M %p') }}
-                                        <br>
-                                        <small class="text-muted">
-                                            {% set time_diff = (now - log.timestamp).total_seconds() %}
-                                            {% if time_diff < 60 %}
-                                                Just now
-                                            {% elif time_diff < 3600 %}
-                                                {{ (time_diff / 60) | int }} minutes ago
-                                            {% elif time_diff < 86400 %}
-                                                {{ (time_diff / 3600) | int }} hours ago
-                                            {% else %}
-                                                {{ (time_diff / 86400) | int }} days ago
-                                            {% endif %}
-                                        </small>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+
+                <div class="activity-icon">
+                    {% if 'registered' in log.action %}
+                        <i class="bi bi-person-plus-fill icon-success"></i>
+                    {% elif 'booked' in log.action %}
+                        <i class="bi bi-calendar-plus-fill icon-primary"></i>
+                    {% elif 'cancelled' in log.action %}
+                        <i class="bi bi-x-circle-fill icon-danger"></i>
+                    {% elif 'updated' in log.action or 'Admin updated' in log.action %}
+                        <i class="bi bi-pencil-square icon-warning"></i>
+                    {% elif 'confirmed' in log.action %}
+                        <i class="bi bi-check-circle-fill icon-info"></i>
+                    {% elif 'deleted' in log.action %}
+                        <i class="bi bi-trash-fill icon-danger"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle-fill icon-secondary"></i>
+                    {% endif %}
+                </div>
+
+                <div class="activity-content">
+                    <div class="activity-header">
+                        <div class="activity-user">
+                            {% if log.user %}
+                                {% if log.user.is_admin %}
+                                    <i class="bi bi-shield-fill-check user-badge-admin"></i>
+                                    <span class="user-name">{{ log.user.name }}</span>
+                                    <span class="badge bg-danger">Admin</span>
+                                {% else %}
+                                    <i class="bi bi-person-circle user-badge-user"></i>
+                                    <span class="user-name">{{ log.user.name }}</span>
+                                    <span class="badge bg-primary">User</span>
+                                {% endif %}
+                            {% else %}
+                                <i class="bi bi-gear-fill user-badge-system"></i>
+                                <span class="user-name text-muted">System</span>
+                            {% endif %}
+                        </div>
+                        <div class="activity-time">
+                            <i class="bi bi-clock"></i>
+                            {{ log.timestamp.strftime('%d %b, %I:%M %p') }}
+                            <span class="time-ago">
+                                {% set time_diff = (now - log.timestamp).total_seconds() %}
+                                {% if time_diff < 60 %}
+                                    • Just now
+                                {% elif time_diff < 3600 %}
+                                    • {{ (time_diff / 60) | int }}m ago
+                                {% elif time_diff < 86400 %}
+                                    • {{ (time_diff / 3600) | int }}h ago
+                                {% else %}
+                                    • {{ (time_diff / 86400) | int }}d ago
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="activity-action">
+                        {{ log.action }}
+                    </div>
+
+                    <div class="activity-id">
+                        <span class="log-id">Log #{{ log.id }}</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="alert alert-info mt-3">
-                <i class="bi bi-info-circle"></i> <strong>Total Logs Displayed:</strong> {{ logs|length }}
-            </div>
-            
-            <!-- Legend -->
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h6>Activity Icons Legend:</h6>
-                    <i class="bi bi-person-plus-fill text-success"></i> User Registration &nbsp;&nbsp;
-                    <i class="bi bi-calendar-plus-fill text-primary"></i> Appointment Booking &nbsp;&nbsp;
-                    <i class="bi bi-x-circle-fill text-danger"></i> Cancellation &nbsp;&nbsp;
-                    <i class="bi bi-check-circle-fill text-success"></i> Confirmation &nbsp;&nbsp;
-                    <i class="bi bi-pencil-fill text-warning"></i> Status Update &nbsp;&nbsp;
-                    <i class="bi bi-info-circle-fill text-info"></i> Other Actions
+            {% endfor %}
+        </div>
+
+        <!-- Legend -->
+        <div class="legend-card">
+            <h6><i class="bi bi-info-circle-fill"></i> Activity Types</h6>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <i class="bi bi-person-plus-fill icon-success"></i>
+                    <span>User Registration</span>
+                </div>
+                <div class="legend-item">
+                    <i class="bi bi-calendar-plus-fill icon-primary"></i>
+                    <span>Appointment Booking</span>
+                </div>
+                <div class="legend-item">
+                    <i class="bi bi-x-circle-fill icon-danger"></i>
+                    <span>Cancellation</span>
+                </div>
+                <div class="legend-item">
+                    <i class="bi bi-check-circle-fill icon-info"></i>
+                    <span>Confirmation</span>
+                </div>
+                <div class="legend-item">
+                    <i class="bi bi-pencil-square icon-warning"></i>
+                    <span>Status Update</span>
+                </div>
+                <div class="legend-item">
+                    <i class="bi bi-trash-fill icon-danger"></i>
+                    <span>Deletion</span>
                 </div>
             </div>
-        {% else %}
-            <div class="alert alert-warning">
-                <h4><i class="bi bi-exclamation-triangle"></i> No Activity Logs</h4>
-                <p>No activity has been logged yet.</p>
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-clock-history"></i>
             </div>
-        {% endif %}
-    </div>
+            <h3>No Activity Yet</h3>
+            <p>No activity has been logged in the system yet. User actions and system events will appear here.</p>
+        </div>
+    {% endif %}
 </div>
 
-<!-- Statistics Cards -->
-<div class="row mt-4">
-    <div class="col-md-3">
-        <div class="card border-success">
-            <div class="card-body text-center">
-                <i class="bi bi-person-plus display-4 text-success"></i>
-                <h5 class="mt-2">Registrations</h5>
-                <h3>{{ registration_count }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-primary">
-            <div class="card-body text-center">
-                <i class="bi bi-calendar-plus display-4 text-primary"></i>
-                <h5 class="mt-2">Bookings</h5>
-                <h3>{{ booking_count }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-danger">
-            <div class="card-body text-center">
-                <i class="bi bi-x-circle display-4 text-danger"></i>
-                <h5 class="mt-2">Cancellations</h5>
-                <h3>{{ cancellation_count }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-warning">
-            <div class="card-body text-center">
-                <i class="bi bi-pencil display-4 text-warning"></i>
-                <h5 class="mt-2">Admin Updates</h5>
-                <h3>{{ admin_update_count }}</h3>
-            </div>
-        </div>
-    </div>
-</div>
+<style>
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 32px;
+}
+
+.page-header h1 i {
+    color: var(--primary);
+}
+
+.page-header .lead {
+    margin: 0;
+}
+
+.page-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Statistics Summary */
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.summary-card > i {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.summary-card:nth-child(1) > i {
+    background: var(--info-light);
+    color: var(--info);
+}
+
+.summary-card:nth-child(2) > i {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.summary-card:nth-child(3) > i {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.summary-card:nth-child(4) > i {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.summary-content {
+    flex: 1;
+}
+
+.summary-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.summary-label {
+    font-size: 13px;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+/* Activity Section */
+.activity-section {
+    margin-bottom: 32px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.section-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.section-header h2 i {
+    color: var(--primary);
+}
+
+.activity-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--info-light);
+    color: var(--info);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Activity Feed */
+.activity-feed {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 24px;
+}
+
+/* Activity Item */
+.activity-item {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 10px;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.activity-item:hover {
+    background: var(--gray-50);
+    transform: translateX(4px);
+}
+
+.activity-item:not(:last-child) {
+    margin-bottom: 16px;
+}
+
+/* Timeline */
+.activity-timeline {
+    position: relative;
+    width: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.timeline-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--primary-light);
+    z-index: 1;
+}
+
+.timeline-line {
+    flex: 1;
+    width: 2px;
+    background: var(--gray-200);
+    margin-top: 4px;
+}
+
+.activity-item:last-child .timeline-line {
+    display: none;
+}
+
+/* Activity Icon */
+.activity-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.icon-success {
+    color: var(--success);
+    background: var(--success-light);
+}
+
+.icon-primary {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.icon-danger {
+    color: var(--danger);
+    background: var(--danger-light);
+}
+
+.icon-warning {
+    color: var(--warning);
+    background: var(--warning-light);
+}
+
+.icon-info {
+    color: var(--info);
+    background: var(--info-light);
+}
+
+.icon-secondary {
+    color: var(--gray-600);
+    background: var(--gray-200);
+}
+
+/* Activity Content */
+.activity-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.activity-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-badge-admin,
+.user-badge-user,
+.user-badge-system {
+    font-size: 18px;
+}
+
+.user-badge-admin {
+    color: var(--danger);
+}
+
+.user-badge-user {
+    color: var(--primary);
+}
+
+.user-badge-system {
+    color: var(--gray-500);
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 14px;
+}
+
+.activity-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.activity-time i {
+    color: var(--gray-400);
+}
+
+.time-ago {
+    color: var(--gray-500);
+    font-size: 12px;
+}
+
+/* Activity Action */
+.activity-action {
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    padding: 10px 14px;
+    background: var(--gray-50);
+    border-radius: 8px;
+    border-left: 3px solid var(--primary);
+}
+
+.activity-id {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.log-id {
+    font-size: 12px;
+    color: var(--gray-500);
+    font-family: monospace;
+}
+
+/* Legend Card */
+.legend-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+}
+
+.legend-card h6 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 16px;
+}
+
+.legend-card h6 i {
+    color: var(--info);
+}
+
+.legend-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--gray-700);
+    padding: 8px 12px;
+    background: var(--gray-50);
+    border-radius: 8px;
+}
+
+.legend-item i {
+    font-size: 18px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+}
+
+.empty-state-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state-icon i {
+    font-size: 56px;
+    color: var(--gray-400);
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 15px;
+    color: var(--gray-600);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .page-actions {
+        width: 100%;
+    }
+
+    .page-actions .btn-secondary {
+        width: 100%;
+    }
+
+    .stats-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .activity-count {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .activity-item {
+        gap: 12px;
+    }
+
+    .activity-timeline {
+        display: none;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .activity-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .legend-items {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+}
+</style>
 {% endblock %}

@@ -238,8 +238,14 @@ def delete_appointment(appointment_id):
 @admin_required
 def announcements():
     """View all announcements"""
+    from forms import AnnouncementForm  # Make sure this import is at the top of the file
+    
+    form = AnnouncementForm()  # Create form instance
     all_announcements = Announcement.query.order_by(Announcement.created_at.desc()).all()
-    return render_template('admin/announcements.html', announcements=all_announcements)
+    
+    return render_template('admin/announcements.html', 
+                         announcements=all_announcements,
+                         form=form)  # Pass form to template
 
 
 @admin_bp.route('/add-announcement', methods=['GET', 'POST'])

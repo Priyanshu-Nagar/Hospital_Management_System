@@ -3,72 +3,656 @@
 {% block title %}Create Announcement - Hospital Management System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0"><i class="bi bi-megaphone"></i> Create New Announcement</h4>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('admin.add_announcement') }}">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="mb-3">
-                        {{ form.title.label(class="form-label") }}
-                        {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else ""), placeholder="e.g., Hospital Timings Update") }}
-                        {% if form.title.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.title.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <small class="form-text text-muted">Enter a clear and concise title (5-200 characters)</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.message.label(class="form-label") }}
-                        {{ form.message(class="form-control" + (" is-invalid" if form.message.errors else ""), rows=6, placeholder="Enter your announcement message here...") }}
-                        {% if form.message.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.message.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <small class="form-text text-muted">Provide details about the announcement (10-1000 characters)</small>
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
-                        <strong>Note:</strong> This announcement will be visible to all patients on their dashboard.
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        {{ form.submit(class="btn btn-success btn-lg") }}
-                        <a href="{{ url_for('admin.announcements') }}" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </form>
-            </div>
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-megaphone-fill"></i> Create Announcement</h1>
+        <p class="lead">Post important updates and notifications for all patients</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('admin.announcements') }}" class="btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Announcements
+        </a>
+    </div>
+</div>
+
+<!-- Form Container -->
+<div class="form-container">
+    <div class="form-card">
+        <!-- Card Icon -->
+        <div class="card-icon">
+            <i class="bi bi-megaphone"></i>
         </div>
-        
-        <!-- Preview Card -->
-        <div class="card mt-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0"><i class="bi bi-eye"></i> Preview Tips</h5>
+
+        <!-- Form Header -->
+        <div class="form-header">
+            <h2>New Announcement</h2>
+            <p>Share important information with all registered patients</p>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" action="{{ url_for('admin.add_announcement') }}" class="announcement-form">
+            {{ form.hidden_tag() }}
+
+            <!-- Section Header -->
+            <div class="section-header">
+                <h3><i class="bi bi-pencil-fill"></i> Announcement Details</h3>
+                <p>Provide a clear title and detailed message</p>
             </div>
-            <div class="card-body">
-                <h6>Example Announcements:</h6>
-                <ul>
-                    <li><strong>Title:</strong> "Hospital Closed on Public Holiday"<br>
-                        <strong>Message:</strong> "The hospital will remain closed on [date] for [holiday]. Emergency services will be available 24/7."</li>
-                    <li><strong>Title:</strong> "New Doctor Joined"<br>
-                        <strong>Message:</strong> "We are pleased to announce Dr. [Name], specialist in [field], has joined our team."</li>
-                    <li><strong>Title:</strong> "Updated Operating Hours"<br>
-                        <strong>Message:</strong> "Effective [date], our OPD timings will be [new timings]."</li>
-                </ul>
+
+            <!-- Title Input -->
+            <div class="form-group">
+                {{ form.title.label(class="form-label") }}
+                <div class="input-wrapper">
+                    <i class="bi bi-journal-text input-icon"></i>
+                    {{ form.title(class="form-input" + (" is-invalid" if form.title.errors else ""), placeholder="Enter announcement title (e.g., 'New Clinic Hours', 'Holiday Notice')") }}
+                </div>
+                {% if form.title.errors %}
+                    <div class="error-message">
+                        {% for error in form.title.errors %}
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <small class="form-hint">Keep the title short and descriptive (recommended: 5-10 words)</small>
+            </div>
+
+            <!-- Divider -->
+            <div class="form-divider"></div>
+
+            <!-- Message Textarea -->
+            <div class="form-group">
+                {{ form.message.label(class="form-label") }}
+                <div class="textarea-wrapper">
+                    <i class="bi bi-chat-left-text textarea-icon"></i>
+                    {{ form.message(class="form-textarea" + (" is-invalid" if form.message.errors else ""), rows="8", placeholder="Write your announcement message here...\n\nProvide all necessary details, dates, times, or instructions that patients need to know.") }}
+                </div>
+                {% if form.message.errors %}
+                    <div class="error-message">
+                        {% for error in form.message.errors %}
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <small class="form-hint">Keep announcements clear and concise. Include all relevant details.</small>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <div class="info-icon">
+                    <i class="bi bi-info-circle-fill"></i>
+                </div>
+                <div class="info-content">
+                    <h6>Important Notes</h6>
+                    <ul>
+                        <li>All registered patients will be able to see this announcement</li>
+                        <li>Announcements appear on the patient dashboard</li>
+                        <li>Use clear language and avoid medical jargon when possible</li>
+                        <li>Double-check dates, times, and contact information</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                {{ form.submit(class="btn-submit", value="Publish Announcement") }}
+                <a href="{{ url_for('admin.announcements') }}" class="btn-cancel">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Preview Card -->
+    <div class="preview-card">
+        <h6><i class="bi bi-eye-fill"></i> How it will appear to patients</h6>
+        <div class="preview-content">
+            <div class="preview-announcement">
+                <div class="preview-icon">
+                    <i class="bi bi-megaphone-fill"></i>
+                </div>
+                <div class="preview-details">
+                    <h5>Your Announcement Title</h5>
+                    <p>Your announcement message will appear here once you publish it. Patients will see this on their dashboard.</p>
+                    <div class="preview-meta">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Today's Date</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 32px;
+}
+
+.page-header h1 i {
+    color: var(--primary);
+}
+
+.page-header .lead {
+    margin: 0;
+}
+
+.page-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Form Container */
+.form-container {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Form Card */
+.form-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--gray-200);
+    padding: 40px;
+    position: relative;
+}
+
+/* Card Icon */
+.card-icon {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+}
+
+.card-icon i {
+    font-size: 28px;
+    color: white;
+}
+
+/* Form Header */
+.form-header {
+    text-align: center;
+    margin-bottom: 32px;
+    margin-top: 20px;
+}
+
+.form-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+}
+
+.form-header p {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Announcement Form */
+.announcement-form {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* Section Header */
+.section-header {
+    margin-bottom: 8px;
+}
+
+.section-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.section-header h3 i {
+    color: var(--primary);
+    font-size: 20px;
+}
+
+.section-header p {
+    font-size: 13px;
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Form Group */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 4px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    font-size: 15px;
+    font-family: var(--font-family);
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    transition: all 0.2s;
+}
+
+.form-input:hover {
+    border-color: var(--gray-300);
+    background: white;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.form-input::placeholder {
+    color: var(--gray-400);
+}
+
+.form-input.is-invalid {
+    border-color: var(--danger);
+    background: var(--danger-light);
+}
+
+/* Form Divider */
+.form-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gray-200), transparent);
+    margin: 8px 0;
+}
+
+/* Textarea */
+.textarea-wrapper {
+    position: relative;
+}
+
+.textarea-icon {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    color: var(--gray-400);
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    font-size: 15px;
+    font-family: var(--font-family);
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    transition: all 0.2s;
+    resize: vertical;
+    min-height: 180px;
+    line-height: 1.6;
+}
+
+.form-textarea:hover {
+    border-color: var(--gray-300);
+    background: white;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.form-textarea::placeholder {
+    color: var(--gray-400);
+}
+
+.form-textarea.is-invalid {
+    border-color: var(--danger);
+    background: var(--danger-light);
+}
+
+.form-hint {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin-top: 4px;
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 4px;
+}
+
+.error-message i {
+    font-size: 14px;
+}
+
+/* Info Box */
+.info-box {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    background: var(--info-light);
+    border-radius: 12px;
+    border-left: 4px solid var(--info);
+}
+
+.info-icon {
+    flex-shrink: 0;
+}
+
+.info-icon i {
+    font-size: 24px;
+    color: var(--info);
+}
+
+.info-content h6 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 8px 0;
+}
+
+.info-content ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.info-content li {
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin-bottom: 4px;
+}
+
+.info-content li:last-child {
+    margin-bottom: 0;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn-submit {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    font-family: var(--font-family);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit::before {
+    content: '\F4FE';
+    font-family: 'bootstrap-icons';
+    font-size: 18px;
+}
+
+.btn-cancel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: var(--gray-200);
+    color: var(--gray-900);
+}
+
+/* Preview Card */
+.preview-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+}
+
+.preview-card h6 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 16px;
+}
+
+.preview-card h6 i {
+    color: var(--info);
+}
+
+.preview-content {
+    background: var(--gray-50);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.preview-announcement {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    background: var(--info-light);
+    border-radius: 12px;
+    border-left: 4px solid var(--info);
+}
+
+.preview-icon {
+    flex-shrink: 0;
+}
+
+.preview-icon i {
+    font-size: 24px;
+    color: var(--info);
+}
+
+.preview-details h5 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 8px 0;
+}
+
+.preview-details p {
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin: 0 0 12px 0;
+}
+
+.preview-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gray-600);
+}
+
+.preview-meta i {
+    color: var(--gray-400);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .page-actions {
+        width: 100%;
+    }
+
+    .page-actions .btn-secondary {
+        width: 100%;
+    }
+
+    .form-card {
+        padding: 32px 24px;
+    }
+
+    .card-icon {
+        width: 56px;
+        height: 56px;
+        top: -28px;
+    }
+
+    .card-icon i {
+        font-size: 24px;
+    }
+
+    .page-header h1 {
+        font-size: 28px;
+    }
+
+    .form-header h2 {
+        font-size: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-cancel {
+        order: 2;
+    }
+
+    .info-box {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .preview-announcement {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-card {
+        padding: 24px 20px;
+        border-radius: 12px;
+    }
+
+    .form-container {
+        padding: 0 12px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .section-header h3 {
+        font-size: 16px;
+    }
+}
+
+/* Focus Visible for Accessibility */
+.form-input:focus-visible,
+.form-textarea:focus-visible,
+.btn-submit:focus-visible,
+.btn-cancel:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Loading State */
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+</style>
 {% endblock %}
